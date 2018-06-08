@@ -1,0 +1,28 @@
+---
+title: "Cosas por checar para visualizaciones y dashboards"
+author: "José Antonio García Ramirez"
+date: "June 3, 2018"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: rows
+    social: menu
+    source_code: embed
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+
+```
+
+https://github.com/edroga/Mexico-Choropleth-map
+
+## A este men 
+
+
+https://github.com/diegovalle
+
+El package *flexdashboard* 
