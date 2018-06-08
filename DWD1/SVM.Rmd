@@ -1,0 +1,58 @@
+---
+title: "planteamiento"
+author: "José Antonio García Ramirez"
+output: 
+  html_document:
+    mathjax: "http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"
+
+---
+
+
+Para SVM la función objetivo primal es 
+\[
+\min_{w,\beta,\epsilon} (1/2)w^tw+Ce^t \epsilon 
+\]
+
+ Sujeto a 
+
+\[
+YX^t +\beta y+\epsilon \geq e,  \epsilon_i \geq 0
+\]
+
+La función de costo anterior, después de efectuar los productos punto, tiene un lagrangiano dado por :
+
+\[
+L_{p-SVM} = \frac{||w||^2}{2}+C\sum_{i=1}^n\epsilon_i- \sum_{i=1}^n \alpha_i[ y_i(x_i^tw +\beta ) -(1-\delta_i)  ]- \sum_{i=1}^n\mu_i \epsilon_i
+\]
+
+Derivando lo anterior con respecto a $w$,$\beta$ y $\epsilon_i$ e igualando a cero tenemos que :
+\[
+w = \sum_{i=1}^n \alpha_i y_ix_i
+\]
+\[
+0 = \sum_{i=1}^n \alpha_i y_i
+\]
+\[
+\alpha_i = C- \mu_i, \forall i
+\]
+
+Por las restricciones de positividad $\alpha_i,\mu_i,\epsilon_i \geq 0$ y sustituyendo lo anterior en (2) 
+
+\[ \]
+\[ \]
+\[ \]
+\[ \]
+\[ \]
+\[ \]
+\[ \]
+\[ \]
+\[ \]
+\[ \]
+\[ \]
+
+Tenemos el problema dual:
+
+\[
+L_{D-SVM} =\sum_{i=1}^n \alpha_i - (1/2)\sum_{i=1}^n\sum_{j=1}^n\alpha_i\alpha_jy_iy_jx_i^tx_j 
+\]
+Lo anterior proporciona una cota inferior de (2), si maximizamos $L_{D-SVM}$ sujeto a $0\leq \alpha_i \leq C$ y 

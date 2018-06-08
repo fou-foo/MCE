@@ -1,0 +1,77 @@
+---
+title: "planteamientoDWD"
+author: "José Antonio García Ramirez"
+output: 
+  html_document:
+    mathjax: "http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"
+
+---
+
+
+Para DWD la función objetivo primal es 
+
+\[
+\min_{r,w,\beta,\epsilon} \sum_{i}(1/r_i) + Ce^t \epsilon
+\]
+
+Sujeto a 
+
+\[
+r =YX^tw+\beta y+\epsilon
+\]
+\[
+(1/2)w^t w \leq 1/2
+\]
+\[
+r_i\geq0,\epsilon_i\geq0
+\]
+
+La condición de que la norma de $w$ sea la unidad se relaja a que sea a lo más la unidad, esto hace el problema convexo.
+
+La parte ingeniosa y delicada de la derivación consiste en eliminar los recíprocos utilizando restricciones de conos de segundo orden. Los conos de segundo orden se definen como las hipersuperficies que son de la forma:
+
+\[
+S_{m+1}:=\{(\eta, u) \in R^{m+1}: \eta \geq ||u||
+\]
+
+Notemos en lo anterior que $u$ es un vector de dimensión $m$. Considerando los conos mencionados se definen $r_i= \rho_i - \sigma_i$ donde $\rho_i=(r_i+ 1/r_i)/2,\sigma_i=(1/r_i -r_i)/2$. Entonces $\rho_i^2-\sigma_i^2=1$ o $(\rho_i, \sigma_i,1)\in S_3$ y $\rho_i+\sigma_i =1/r_i$. 
+
+Entonces sustituyendo lo anterior en (5) la función de costo a minimizar se convierte en:
+
+\[
+\min_{ \phi ,w,\beta,\epsilon, \rho,\sigma,\tau} Ce^t \epsilon + e^t\rho +\epsilon^t \sigma
+\]
+
+Sujeto a 
+
+\[
+YX^tw+\beta y+\epsilon-\rho+\sigma = 0
+\]
+\[
+\phi = 1
+\]
+\[
+\tau=e
+\]
+Con $(\phi,w)\in S_{d+1}, \epsilon_i \geq 0, (\rho_i,\sigma_i,\tau_i)\in  S_3,i=1,2,\dots ,n$.
+
+Es importante notar que la condiciónn $\psi =1$ es el segundo detalle importante pues esto transforma el problema de buscar un vector de norma menor a la unidad $w$ en $R^d$  en buscar un punto en el cono embebido en $S_{d+1}$ lo cual en principio podría parecer extraño\footnote{Pues incrementa la dimensión del espacio de búsqueda} sin embargo notemos que en la formulación anterior todas las restricciones son lineales. 
+
+En general los problemas SOCP, tiene un dual amable el cual es:
+
+\[
+\max_{ \alpha } -||XY\alpha||+2e^t\sqrt{\alpha}
+\]
+
+Sujeto a 
+\[
+y^t\alpha = 0
+\]
+\[
+0\leq \alpha \leq Ce 
+\]
+
+El dual anterior se asemeja mucho al problema dual correspondiente a SVM el cual maximiza
+
+$- (1/2) ||XY \alpha ||^2 + e^t\alpha$ 
+
