@@ -35,7 +35,7 @@ server <- function(input, output) {
     neg.mean <- apply(neg, 2, mean)
     w <- ginv(I) %*% (pos.mean - neg.mean)
     w <- w/sum(w**2)**.5 #normalizamos el vector MDP
-    X <- ginv(cov(pos)) %*% (pos.mean - neg.mean)
+    X <- ginv(cov(stack)) %*% (pos.mean - neg.mean)
     X <- X/sum(X**2)**.5 #normalizamos el vector que define al frontera de Bayes
     #acos(sum(X*w))*360/(2*pi)
     stack$label <- 1

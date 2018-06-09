@@ -16,7 +16,9 @@ sidebar <- dashboardSidebar(
     menuItem("CIMAT", tabName = "CIMAT", icon = icon("dashboard")),
     menuItem("DWD", icon = icon("th"), tabName = "DWD",
              badgeLabel = "nuevo", badgeColor = "green"),
-    menuItem("Optimizacion", icon = icon("th"), tabName = "Optimizacion")
+    menuItem("Optimizacion", icon = icon("th"), tabName = "Optimizacion"),
+    menuItem("ResultadosDatosSimulados",  icon = icon("th"), tabName = "ResultadosDatosSimulados"),
+    menuItem("ResultadosDatosReales",  icon = icon("th"), tabName = "ResultadosDatosReales")
   )
 )
 #cramos varias tabs
@@ -66,22 +68,38 @@ body <- dashboardBody(
     #la tab de la derivacion
      tabItem(tabName = "Optimizacion",  h2("Problema de optimización de DWD"),
              fluidRow( h1('                        '),
-               box(width = 12, column(4), column(3,
-                       img(src='margen.png', align = "center", height = 400),
-                       column(4)
-               ))), hr(),
+               box(width = 12,  column(6,img(src='margen.png', align = "center", height = 400)),
+                       column(4, img(src='cono.png', align = "center", height = 400))
+               )), hr(),
              fluidRow( 
                box( width = 12,       column(6,  withMathJax(includeMarkdown(("SVM.Rmd")))) ,
                    
                        column(6, withMathJax(includeMarkdown(("planteamientoDWD.Rmd"))))
                  )
              )
-                      
-              
-            )
+            ),
+    #la tab de resultados experimentales
+    tabItem(tabName = "ResultadosDatosSimulados",  h1("ResultadosDatosSimulados"),
+            fluidRow( h1('                        '),
+                      box( column(6, img(src='simulacion1.png', align = "center", height = 500))),
+                      box(column(6,  img(src='simulacion3.png', align = "center", height = 500)))), 
+            fluidRow(box(width = 12,column(4,
+                             img(src='simulacion3.png', align = "center", height = 500)
+                      )
+                      ))),
+    tabItem(tabName = "ResultadosDatosReales",  h1("ResultadosDatosReales"),
+            fluidRow( h1('                        '),
+                      box( column(5, img(src='cancergrande.jpeg', align = "center", height = 700))),
+                      box(column(5,  img(src='cancer_coom.jpeg', align = "center", height = 700)))), 
+            fluidRow(box(width = 12,column(10,  img(src='simulacion3.png', align = "center", height = 700))
+            )))
+            
             
     )
-  )
+            
+    )
+
+
 
 # Put them together into a dashboardPage
 dashboardPage(skin = "purple", 
