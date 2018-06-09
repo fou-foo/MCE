@@ -1,0 +1,12 @@
+name: DWD1
+title: DWD1
+username:
+account: joseramirezcimat
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 349444
+bundleId: 1420635
+url: https://joseramirezcimat.shinyapps.io/DWD1/
+when: 1528582106.15626
+asMultiple: FALSE
+asStatic: FALSE
