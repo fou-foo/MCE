@@ -102,30 +102,39 @@ ggplot(a2, aes(x=as.numeric(parametro), y=media, colour=metodo)) +
 ####################### datos genes
 setwd('/home/fou/Desktop/MCE/Second/CienciaDeDatos/DWD1')
 dir()
-#genes <- read.csv('/home/fou/Desktop/TCGA-PANCAN-HiSeq-801x20531/data.csv', header = TRUE)
-#grid <- seq(0.3162278, 31, length =5  )
-#grid <- grid**2
-#genes$X <- NULL
-#y <- read.csv('/home/fou/Desktop/TCGA-PANCAN-HiSeq-801x20531/labels.csv', header = TRUE)
-#table(y$Class)
-#datos <-  y$Class %in% c('COAD', 'LUAD')
-#datos <- genes[datos, ]
+genes <- read.csv('/home/fou/Desktop/TCGA-PANCAN-HiSeq-801x20531/data.csv', header = TRUE)
+genes$X <- NULL
+y <- read.csv('/home/fou/Desktop/TCGA-PANCAN-HiSeq-801x20531/labels.csv', header = TRUE)
+table(y$Class)
+#################3 muestreo por columnas
+index <-  y$Class %in% c('COAD', 'LUAD')
+set.seed(123)
+datos <- genes[index, sample(1:20531,456*4) ]
+y <- y$Class[index]
+table(y)
+######################3 muestreo por reglones
+index <-  sample(1:219, 136)
+datos <- datos[index, ]
+y <- y[index]
+table(y)
 write.csv(datos, 'subgenes.csv')
-write.csv(y$Class[datos], 'sub_y.csv')
+write.csv(y, 'sub_y.csv')
 genes <- read.csv('subgenes.csv')
+data <- genes
 y <- read.csv('sub_y.csv')
-cancer$V2 <- NULL
-data <- cancer
+y <- y$x
+data <- genes
+grid <- seq(.1, 3, length = 10  )
 train.lm.cv <- function(x, data, y  )
 {
     data <- data
     y <- y 
-    cv <- 10
+    cv <- 5
     #funcion para evaluar por cv lm
     set.seed(0)
     #data <- data[ sample(1:dim(data)[1], dim(data)[1]),]
     p <- dim(data)[2]
-    bloque <- round(dim(data)[1]/10)
+    bloque <- round(dim(data)[1]/cv)
     breaks <- c(seq(1, dim(data)[1], by = bloque  ), dim(data)[1])
     error <- matrix( rep(1, 10*5 ), ncol = 5  )
     colnames(error) <- c('MDP', 'RLR', 'SVM', 'DWD', 'Adaboost')
@@ -133,14 +142,15 @@ train.lm.cv <- function(x, data, y  )
     function(x){
         for (i in 1:(length(breaks)-1))
         {
+            gc()
             indices <- breaks[i]:breaks[i+1]
             test <- data[ indices,   ]
-            train <- data[ -indices,   ]
+            train <- data[- indices,   ]
             y.test <- y[indices]
             y.train <- y[-indices]
             ##############evaluacion de MDP 
-            pos.mean <- apply(train[ y.train=='B',  ], 2, mean)
-            neg.mean <- apply(train[ y.train=='M',  ], 2, mean)
+            pos.mean <- apply(train[ y.train=='COAD',  ], 2, mean)
+            neg.mean <- apply(train[ y.train=='LUAD',  ], 2, mean)
             X <- ginv(cov(train)) %*% (pos.mean - neg.mean)
             MDP <- X/sum(X**2)**.5 #normalizamos el vector 
             test.predic <- as.matrix(test)%*%MDP
@@ -187,17 +197,18 @@ train.lm.cv <- function(x, data, y  )
         return( res )
     }
 }
-train.cv.10 <- train.lm.cv(data=cancer, y=y)
+train.cv.10 <- train.lm.cv(data=genes, y=y)
 library(parallel)
-simula.cancer <- mclapply(X=grid, FUN=train.cv.10, mc.cores = 4)
+simula.cancer <- lapply(X=grid, FUN=train.cv.10)
 library(abind)
 a <- abind(simula.cancer, along = 1)
 a2 <- data.frame(metodo = row.names(a), media = as.numeric(a[,1]), sd = as.numeric(a[,2]), parametro = a[,3])
-ggplot(a2, aes(x=as.numeric(parametro), y=media, colour=metodo)) + 
+library(ggplot2)
+ggplot(a2, aes(x=as.numeric(as.character(parametro)), y=media, colour=metodo)) + 
     #geom_errorbar(aes(ymin=media-sd, ymax=media+sd), width=.1) +
-    geom_line() + geom_point() + scale_x_continuous(trans='log10') + theme_minimal()+ xlab('parametro')+
-    ylab('Error de test') + ggtitle('Desempeño en Wisconsin Diagnostic Breast Cancer')
+    geom_line() + geom_point()  + theme_minimal()+ xlab('parametro')+
+    ylab('Error de test') + ggtitle('Desempeño en genes')
 ggplot(a2, aes(x=as.numeric(parametro), y=media, colour=metodo)) + 
-    #geom_errorbar(aes(ymin=media-sd, ymax=media+sd), width=.1) +
-    geom_line() + geom_point() + scale_x_continuous(trans='log10') + theme_minimal()+ xlab('parametro')+
-    ylab('Error de test') + ggtitle('Desempeño en Wisconsin Diagnostic Breast Cancer') +ylim(c(0,.1))
+    geom_errorbar(aes(ymin=media-sd, ymax=media+sd), width=.1) +
+    geom_line() + geom_point()  + theme_minimal()+ xlab('parametro')+
+    ylab('Error de test') + ggtitle('Desempeño en genes')

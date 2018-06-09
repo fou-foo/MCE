@@ -82,7 +82,7 @@ body <- dashboardBody(
     tabItem(tabName = "ResultadosDatosSimulados",  h1("ResultadosDatosSimulados"),
             fluidRow( h1('                        '),
                       box( column(6, img(src='simulacion1.png', align = "center", height = 500))),
-                      box(column(6,  img(src='simulacion3.png', align = "center", height = 500)))), 
+                      box(column(6,  img(src='simulacion2.png', align = "center", height = 500)))), 
             fluidRow(box(width = 12,column(4,
                              img(src='simulacion3.png', align = "center", height = 500)
                       )
@@ -91,13 +91,9 @@ body <- dashboardBody(
             fluidRow( h1('                        '),
                       box( column(5, img(src='cancergrande.jpeg', align = "center", height = 700))),
                       box(column(5,  img(src='cancer_coom.jpeg', align = "center", height = 700)))), 
-            fluidRow(box(width = 12,column(10,  img(src='simulacion3.png', align = "center", height = 700))
-            )))
-            
-            
-    )
-            
-    )
+            fluidRow(box( column(5, img(src='genes_todos.jpeg', align = "center", height = 700))),
+                     box(column(5,  img(src='genes_intervalos.jpeg', align = "center", height = 700)))))
+            ))
 
 
 
