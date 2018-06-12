@@ -25,8 +25,14 @@ sidebar <- dashboardSidebar(
 body <- dashboardBody(
   tabItems(
     tabItem(tabName = "CIMAT",
-            h2('Distance Weighted Discrimination (DWD)'),
-            h3('y la maldición de la dimensionalidad')
+            h1('Una revisión del método Distance Weighted Discrimination'),
+            h2('¿Una mejora de SVM en dimensiones altas?'), 
+            p('                '),p('                '),hr(), hr(), hr(),
+            h1('Motivación:'),
+            h2('Object data analysis'),
+            hr(),hr(),
+            fluidRow( box(  h1('Antes de 2007, enfocado a genes')   ),
+                      box(h1('Después de 2017, extensión a kernels (formal)')))
     ),
     
     tabItem(tabName = "DWD",
@@ -48,6 +54,7 @@ body <- dashboardBody(
             box(
               #title = "Proyección sobre la dirección MDP",
                #solidHeader = TRUE, background = 'light-blue',
+                h4('Notemos el valor de las medianas de las distancias conforme la dimensión se incrementa'),
               plotlyOutput("DWD", height = 230) 
               ),
             fluidRow(
