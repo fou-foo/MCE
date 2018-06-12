@@ -29,7 +29,8 @@ body <- dashboardBody(
             h2('¿Una mejora de SVM en dimensiones altas?'), 
             p('                '),p('                '),hr(), hr(), hr(),
             h1('Motivación:'),
-            h2('Object data analysis'),
+            h2('Object data analysis'), hr(), h2('HDLSS'),
+            hr(), h2('Reinventar la mayoría de todos los tipos de inferencia estadística'),
             hr(),hr(),
             fluidRow( box(  h1('Antes de 2007, enfocado a genes')   ),
                       box(h1('Después de 2017, extensión a kernels (formal)')))
@@ -68,8 +69,8 @@ body <- dashboardBody(
           box(width = 12,h4('Las config. HDLSS tienden asintóticamente (d al inf. y n fijo) a tener una estructura geométrica fundamentalmente rígida'), 
             h4('La principal fortaleza de DWD es que su desempeño es cercano al de SVM, cuando SVM es mejor'),
                h5('Cuando d >>n los datos consisten en un subespacio n dimensional y la idea de trabajar en este espacio es impráctica'),
-                h6('Los nuevos datos se espera que aparezcan fuera de este subespacio'),
-            h6('En el contexto de microarreglos el interés recae en solo algunos subconjuntos de genes específicos y esta atención es más difícil de mantener solo con algunas combinaciones lineales (es decir cualquier base del subespacio generado por los datos) de lo genes considerados')
+                h6('Los nuevos datos se espera que aparezcan fuera de este subespacio')
+            #h6('En el contexto de microarreglos el interés recae en solo algunos subconjuntos de genes específicos y esta atención es más difícil de mantener solo con algunas combinaciones lineales (es decir cualquier base del subespacio generado por los datos) de lo genes considerados')
           ))
     ),
     #la tab de la derivacion
@@ -77,7 +78,7 @@ body <- dashboardBody(
              fluidRow( h1('                        '),
                box(width = 12,  column(6,img(src='margen.png', align = "center", height = 400)),
                        column(4, img(src='cono.png', align = "center", height = 400))
-               )), hr(),
+               )), hr(), h2('-Interpretación física'), 
              fluidRow( 
                box( width = 12,       column(6,  withMathJax(includeMarkdown(("SVM.Rmd")))) ,
                    
