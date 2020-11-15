@@ -1,0 +1,183 @@
+%\PassOptionsToPackage{spanish,english}{babel}
+\documentclass[letter]{memoir} %Tipo de papel
+\usepackage[T1]{fontenc}		%Previene errores en el encoding
+\usepackage[utf8]{inputenc}		%para identificar acentos(encoding)
+\usepackage[spanish]{babel}		%cambiar idioma de las etiquetas
+\decimalpoint
+\usepackage{tcolorbox}  %para resaltar los statements de las respuestas
+\usepackage{float}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{longtable}
+\usepackage[unicode=true,pdfusetitle,
+            bookmarks=true,bookmarksnumbered=false,bookmarksopen=false,
+            breaklinks=false,pdfborder={0 0 1},backref=false,colorlinks=false]
+{hyperref}
+\usepackage{breakurl}
+\usepackage{geometry}
+
+ \geometry{
+ a4paper,
+ total={175mm,265mm},
+ left=15mm,
+ top=15mm,
+ }
+\usepackage{tikz} %paras poner circulitos dentro de matrices
+\usepackage{tikz-cd}
+\newcommand\Circle[1]{%
+  \tikz[baseline=(char.base)]\node[circle,draw,inner sep=2pt] (char) {#1};}
+
+
+
+  
+ 
+\newenvironment{cframed}[1][blue]
+  {\begin{tcolorbox}[colframe=#1,colback=white]}
+  {\end{tcolorbox}}
+
+\begin{document}
+
+\title{Álgebra Matricial\\
+\large{Tarea 6  }}
+\author{ J. Antonio García, jose.ramirez@cimat.mx}
+
+%\newpage
+\maketitle
+\begin{enumerate}
+\begin{cframed}[violet]
+\item Sea $V$ un espacio con producto interno. Demuestre la ley del paralelogramo:
+\[
+||x + y||^2 + ||x - y||^2 = 2||x||^2 + 2||y||^2, \forall x,y \in V
+\]
+\end{cframed}
+Tomemos
+\begin{equation}
+\begin{split}
+||x+y||^2 &= <x+y,x+y> = <x+y,x> +<x+y,y>  \\
+		& = (<x,x> +<y,x>) + (<x,y> +<y,y>)  \\
+        & = ||x||^2+2<y,x>+||y||^2 \\
+\end{split}
+\end{equation}
+Por otro lado 
+\begin{equation}
+\begin{split}
+||x-y||^2 &= <x-y,x-y> = <x-y,x> +<x-y,-y>  \\
+		& = (<x,x> -<y,x>) + (-<x,y> +<y,y>)  \\
+        & = ||x||^2-2<y,x>+||y||^2 \\
+\end{split}
+\end{equation}
+Sumando (1) y (2)  tenemos el resultado.
+
+\begin{cframed}[teal]
+\item Sea $S = \{(1, 0, 1), (0, 1, 1), (1, 3, 3)\} \subset  R^3$. Encuentre $gen(S)$. Use el proceso
+de ortogonalizacion de Gram-Schmidt para obtener una base ortogonal, y luego una ortonormal de $gen(S)$.
+\end{cframed}
+Al colocar los vectores de $S$ en las columnas de una matriz y recudir por Gauss, notamos que los vectores son l.i. por lo que generan $R^3$.
+Utilizanso el método de Gram-Schimdt tenemos (llamando $z_1 = (1, 0, 1)^t, z_2 = (0, 1, 1)^t, z_3 = (1, 3, 3)^t$ :
+\begin{equation*}
+\begin{split}
+o_1 = z_1
+\end{split}
+\end{equation*}
+Con lo que podemos escribir el primer vector ortonormal como $q_1 = \frac{1}{\sqrt{2}}(1,0,1)^t$
+
+Luego 
+\begin{equation*}
+\begin{split}
+o_2 &= z_2 - \frac{<z_2,o_1>}{<o_1, o_1>}o_1 \\
+ & = z_2 - \frac{1}{2}o_1 = \frac{1}{2}(-1 , 2 ,1)^t \\
+ & \Rightarrow q_2 = \frac{1}{\sqrt{6}} (-1,2,1)^t
+\end{split}
+\end{equation*}
+Y finalmente 
+\begin{equation*}
+\begin{split}
+o_3 &= z_3 - \frac{<z_3,o_1>}{<o_1, o_1>}o_1 -\frac{<z_3,o_2>}{<o_2, o_2>}o_1 \\
+ &= z_3 - 2o_1 -\frac{4}{3}o_1 = \frac{1}{3}(1,1,-1) \\
+ & \Rightarrow q_3 = \frac{1}{\sqrt{3}} (1,1,-1)^t
+\end{split}
+\end{equation*}
+Y tenemos que $[q_1,q_2,q_3]$ son ortogonales y unitarios.
+
+\begin{cframed}[violet]
+\item 
+Sea
+\[A   = \begin{pmatrix}
+			2 & 1 & 1 \\
+            1 & 2  &1 \\
+             1 & 1 & 2
+            \end{pmatrix} 
+\]
+Encuentre una matriz ortogonal $P$ y una diagonal $D$ tal que $A = PDP^t$.
+\end{cframed}
+Como la matriz es simétrica y definida positiva entonces existe la matriz $P$ citada, desarrollando por el primer reglón $det(A-\lambda I_3)$ obtenemos que $\rho_A(\lambda)= -\lambda ^ 3 +6\lambda^2 -9\lambda +4 $.\\
+Usando división sintética encontramos que las raíces del polinomio característico son $1$ (con multiplicidad dos) y $4$. Por un resultado visto en clase sabemos que los vectores propios de una matriz simétrica son ortogonales por lo que los vectores propios asociados a los anteriores valores propios formarían una buena base codificada en la matriz $P$ 
+Sin embargo como la multiplicidad del valor propio $1$ es dos, éste valor no proporciona dos valores propios adecuados, sin embargo al considerar el espacio nulo de $A- \lambda I_3$ obtenemos que los vectores $z_1 = (1-1,1,0)^t$ y $z_2=(-1,0,1)^t$ generan dicha nulidad.
+Por otro lado al considerar de $A-4\lambda$ obtenemos el vector propio $z_3 =(3,1,1)^t$.\\
+Al considerar la matriz $[z_1,z_2,z_3]$ y reducir usando Gauss obtenemos que son l.i. por lo que podemos usar Gram-Schmidt para obtener vectores ortogonales a partir de ellos.
+\begin{equation*}
+\begin{split}
+o_1 = z_1
+\end{split}
+\end{equation*}
+Con lo que podemos escribir el primer vector ortonormal como $q_1 = \frac{1}{\sqrt{2}}(-1,1,0)^t$
+Luego 
+\begin{equation*}
+\begin{split}
+o_2 &= z_2 - \frac{<z_2,o_1>}{<o_1, o_1>}o_1 \\
+ & = z_2 - \frac{1}{2}o_1 = (-1,0,1) - \frac{1}{2}(-1 , 1,0 )^t = (-1/2,-1/2,1)^t \\
+ & \Rightarrow q_2 = \frac{1}{\sqrt{6}} (-1,-1,2)^t
+\end{split}
+\end{equation*}
+Y finalmente 
+\begin{equation*}
+\begin{split}
+o_3 &= z_3 - \frac{<z_3,o_1>}{<o_1, o_1>}o_1 -\frac{<z_3,o_2>}{<o_2, o_2>}o_1 \\
+ &= z_3 + o_1 + \frac{2}{3}o_1 = \frac{1}{6}(10,10,10)^t \\
+ & \Rightarrow q_3 = \frac{1}{\sqrt{3}} (1,1,1)^t
+\end{split}
+\end{equation*}
+Y tenemos que $P = [q_1,q_2,q_3]$ son ortogonales y unitarios.
+Escribiendo 
+
+\[
+\begin{split}
+ PDP^{-1} &  =  \begin{pmatrix}
+	-1/\sqrt{2} & -1/\sqrt{6} & -1/\sqrt{3} \\
+	1/\sqrt{2} & -1/\sqrt{6} & 1/\sqrt{3} \\
+	0 & 2/\sqrt{6} & 1/\sqrt{3} \\
+    \end{pmatrix} 
+ \begin{pmatrix}
+	1 & 0 & 0 \\
+   0 & 1  & 0 \\
+    0 &0 & 4
+    \end{pmatrix}     
+    \begin{pmatrix}
+	-1/\sqrt{2} & 1/\sqrt{2} & 0 \\
+	-1/\sqrt{6} & -1/\sqrt{6} & 2/\sqrt{6} \\
+	1/\sqrt{3} & 1/\sqrt{3} & 1/\sqrt{3} \\
+    \end{pmatrix}     \\
+    &  =  \begin{pmatrix}
+	-1/\sqrt{2} & -1/\sqrt{6} & -1/\sqrt{3} \\
+	1/\sqrt{2} & -1/\sqrt{6} & 1/\sqrt{3} \\
+	0 & 2/\sqrt{6} & 1/\sqrt{3} \\
+    \end{pmatrix} 
+     \begin{pmatrix}
+	-1/\sqrt{2} & 1/\sqrt{2} & 0 \\
+	-1/\sqrt{6} & -1/\sqrt{6} & 2/\sqrt{6} \\
+	4/\sqrt{3} & 4/\sqrt{3} & 4/\sqrt{3} \\
+    \end{pmatrix}     \\
+    & =  \begin{pmatrix}
+	3/6+1/6+8/6 & -3/6+1/6+8/6 & -2/6+8/6 \\
+	-3/6+1/6+8/6 & 3/6+1/6+8/6 & -2/6+8/6 \\
+	-2/6+8/6 & -2/68/6 & 4/6+8/6 \\
+    \end{pmatrix}     =A
+\end{split}
+\]
+
+
+\end{enumerate}
+
+
+\end{document}

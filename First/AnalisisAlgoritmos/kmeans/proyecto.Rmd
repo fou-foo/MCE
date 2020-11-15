@@ -1,0 +1,31 @@
+---
+title: "planteamiento"
+author: "José Antonio García Ramirez"
+
+output: 
+  html_document:
+    mathjax: "http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"
+
+---
+
+
+# Implementación usando Rcpp (princial) 
+
+La implementación que realice usando Rcpp se anexa en la parte inferior de este *tab*. El algoritmo que seguí es el del texto *The elements of the statistical learning* (2nd, p. 510).
+
+- Para los centroides realice un muestreo del data set original.
+
+- Para el criterio de paro considere un número de iteración, para el parámetro $k$ por la implantación que hice requiere ser hardcodeado (los valores con los que hice el test fueron 3, 4; actualmente he detectado que esto puede implementar por medio de la librarias de estructuras de C++).
+
+
+
+Para esta prueba fijemos $k=3$.
+
+
+La función principal es 
+
+```{r code, eval=FALSE}
+*NumericMatrix CfooKmeans(NumericMatrix data_m, int iteraciones, NumericMatrix distancias, NumericMatrix centroides, int n, NumericVector columnas_vector, int columnas, int k )*
+```
+
+

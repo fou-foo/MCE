@@ -1,0 +1,29 @@
+---
+title: "planteamiento"
+author: "José Antonio García Ramirez"
+output: 
+  html_document:
+    mathjax: "http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"
+
+---
+
+
+# Definición del proyecto
+
+
+El método de kmeans es ampliamente usado, además de ser un problema $NP-hard$ y de complejidad $O(n^{kd})$ con $n$ el número de observaciones, $k$ el número de clusters y $d$ el numero de variables en el problema.
+
+Por ello, a pesar de que su implantación en R es robusta, decidó implementarlo usando R con extinción del package *Rcpp*.
+
+Para plantear ideas decidí utilizar el famoso dataset *iris* , con el que surgió el problema de encontrar grupos parecidos.
+
+Por un lado, realice una implementación en R, y posteriormente otra en donde la mejore usando *Rcpp*.
+ 
+
+## Análisis descriptivo
+
+Como siempre es bueno hacer una exploración en problemas con datos, construimos la siguiente grafica de dispersión interactiva.
+
+### Al posicionarnos en un punto nos da los valores de esa observación
+
+ 

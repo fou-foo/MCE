@@ -1,0 +1,126 @@
+library(shiny)
+library(plotly)
+library(shinydashboard)
+library("microbenchmark")
+library(Rcpp)
+#library(RcppArmadillo)
+library(shinythemes)
+
+sourceCpp("kmeansC.cpp")
+source("kmeans_r.R")
+## J.Antonio Garcia jose.ramirez@cimat.mx
+####################### Precomputo
+data_vis <- iris[, 1:4] 
+
+
+########################## UI
+ui <- fluidPage(
+  theme = shinytheme("cerulean"),
+  h1("Improving k means "),
+
+    mainPanel(
+      tabsetPanel(
+        id = 'dataset',
+        tabPanel("Planteamiento",
+                 tabItem(tabName="foo1",
+                         withMathJax(includeMarkdown("planteamiento.Rmd"))),
+                 hr(),
+                 selectInput('x', 'Variable en el eje X', names(data_vis)),
+                 selectInput('y', 'Variable en el eje Y', names(data_vis)),
+                 plotlyOutput("plot")),
+        
+        tabPanel("Rcppmeans",
+                 tabItem(tabName="foo2",
+                         withMathJax(includeMarkdown("proyecto.Rmd")),
+                 hr(),
+                 selectInput('iteraciones', 'Número de iteraciones', c(10,25, 100,1000 ) ),
+                 h4("Y visualizamos la clasificación del método"),
+                 selectInput('Cx', 'Variable en el eje X', names(data_vis)),
+                 selectInput('Cy', 'Variable en el eje Y', names(data_vis)),
+                 plotlyOutput("plotC") ,
+                 hr(),
+                 hr("Empleando la implementación de R con el mismo número de clusters obtenemos lo siguiente"),
+                 hr(),
+                 plotlyOutput("plotR") ),
+                 hr(), hr(),
+                 tabItem(tabName="foorc",
+                         withMathJax(includeMarkdown("rc.Rmd")))
+                 
+                ) ,
+        
+        tabPanel("Concusiones",
+              tabItem(tabName="foorc",
+                      withMathJax(includeMarkdown("conclusiones.Rmd"))),
+        sidebarLayout(
+          sidebarPanel( ),mainPanel(uiOutput("testing") )),
+        br(),br(),
+        tabItem(tabName="foorc",
+                withMathJax(includeMarkdown("conclusion2.Rmd"))),
+        br(),
+        h1("codigo de FooKmeans"),
+        tabItem(tabName="foorr",
+                withMathJax(includeMarkdown("kmeans.Rmd")))
+        
+        
+        ),
+        tabPanel("Doc de la app",
+                 tabItem(tabName="foo2",
+                         withMathJax(includeMarkdown("doc_app.Rmd"))
+          
+         )
+      )
+  )  )
+)
+
+
+
+# Define server logic required to draw a histogram
+server <- function(input, output, session) {
+  
+   output$plot <-  renderPlotly({ 
+     plot_ly(data = data_vis,  x = ~get(input$x), y = ~get(input$y), color =~iris$Species ,
+                marker = list(size = 10, line = list(color = 'rgb(58,200,225)', width = 1)),
+             text = ~paste(paste0( input$y," : ", get(input$y)), paste0("<br>", input$x," : ", get(input$x))  )) %>%
+     layout(title = 'Dispersion de las variables en el dataset Iris')
+       
+   })
+   ck <- reactive({
+     a <- CfooKmeans(data_m, as.numeric(input$iteraciones), distancias,  centroides, n, columnas_vector, columnas, k )
+     factor(a[,4])
+     })
+    
+    
+   output$plotC <-  renderPlotly({
+     
+      plot_ly(data = data_vis,  x = ~get(input$Cx), y = ~get(input$Cy), color = ck(),
+             marker = list(size = 10, line = list(color = 'rgb(58,200,225)', width = 1)),
+             text = ~paste(paste0( input$Cy," : ", get(input$Cy)), paste0("<br>", input$Cx," : ", get(input$Cx))  )) %>%
+       layout(title = 'Resultados con Rcpp')
+   })
+   
+   output$plotR <-  renderPlotly({
+     
+     plot_ly(data = data_vis,  x = ~get(input$Cx), y = ~get(input$Cy), color = factor(kmeans(data_vis,  3)$cluster),
+             marker = list(size = 10, line = list(color = 'rgb(58,200,225)', width = 1)),
+             text = ~paste(paste0( input$Cy," : ", get(input$Cy)), paste0("<br>", input$Cx," : ", get(input$Cx))  )) %>%
+       layout(title = 'Resultados con la implementación de R')
+   })
+   
+   output$testing<- renderUI({
+   a <- kmeans(iris[, 1:4], 3)
+   iteraciones <- a$iter
+   res<- microbenchmark( 
+     
+     CFoomeans =CfooKmeans(data_m, iteraciones, distancias,  centroides, n, columnas_vector, columnas, k ),
+     R = kmeans(data[,1:4], iter.max = 10, centers = k , algorithm = c("MacQueen")),
+     Foomeans = kmeans.foo(data, k, iteraciones, columnas.vector= c(1,2,3,4) )  ,
+     times = 10L)
+   list( renderPrint(res))
+     })
+   
+
+}
+
+
+
+shinyApp(ui, server)

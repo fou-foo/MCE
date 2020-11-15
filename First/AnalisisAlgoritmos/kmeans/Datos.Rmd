@@ -1,0 +1,19 @@
+---
+title: "Datos"
+output: 
+  html_document:
+    mathjax: "http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"
+---
+
+El conjunto de datos es de 32 carros de modelos de 1973 a 1974, un dataset contenido en el package 'datasets' de R.
+
+Las variables que contemplamos son :
+
+-	*mpg* : Millas por gallon de gasolina
+-	*disp*: Desplasamiento
+-	*hp*: Caballos de fuerza del auto
+-	*drat*: Rear axie ratio
+-	*wt*: Peso (1000 lbs)
+-	*qsec* Tiempo en que recorre un cuarto de milla
+	
+

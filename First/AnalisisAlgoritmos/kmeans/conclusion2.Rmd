@@ -1,0 +1,21 @@
+---
+title: "Datos"
+output: 
+  html_document:
+    mathjax: "http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"
+---
+
+# Conclusiones.
+
+El presente proyecto puso en a prueba las habilidades desarrolladas en la asignatura de AnÃ¡lisis de algoritmos y programación, desde la implementación en R y C, los temas de complejidad computacional y buenas práticas de programación.
+
+La implementación con *Rcpp* es adecuada, pero se puede mejorar en muchos aspectos, algunos del la  de ingeniería de software como extensión a más casos,  otros aspectos estadísticos como el de la elección de puntos que mejoren el desempeño del algoritmo y bien de visión computacional.
+Mi conclusión es que las extensiones de *R* en otros lenguajes es una herramienta poderosa, en el corto, mediano y largo plazo, pues aunque *R* deje de ser el *hit*'* en el análisis estadístico la interacción entre diferentes herramientas es necesaria para proyectos complejos.
+Como trabajo futuro planteo la eliminación del hardcodeo en la implementación hecha con *Rcpp* y paralelizarlo pues *kmeans* es fácil de paralelizar en el esquema de open mp y cuda (al parecer) pues como dijo Til Schuermann  [What Do We Know About Loss Given Default?, 2004](http://mx.nthu.edu.tw/~jtyang/Teaching/Risk_management/Papers/Recoveries/What%20Do%20We%20Know%20About%20Loss-Given-Default.pdf): 
+
+
+
+
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_*but as usual the devil is in the details*_
+
+ Como lo comprobamos en este proyecto...

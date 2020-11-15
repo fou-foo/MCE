@@ -1,0 +1,134 @@
+%\PassOptionsToPackage{spanish,english}{babel}
+\documentclass[letter]{memoir} %Tipo de papel
+\usepackage[T1]{fontenc}		%Previene errores en el encoding
+\usepackage[utf8]{inputenc}		%para identificar acentos(encoding)
+\usepackage[spanish]{babel}		%cambiar idioma de las etiquetas
+\decimalpoint
+\usepackage{tcolorbox}  %para resaltar los statements de las respuestas
+\usepackage{float}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{longtable}
+\usepackage[unicode=true,pdfusetitle,
+            bookmarks=true,bookmarksnumbered=false,bookmarksopen=false,
+            breaklinks=false,pdfborder={0 0 1},backref=false,colorlinks=false]
+{hyperref}
+\usepackage{breakurl}
+\usepackage{geometry}
+
+ \geometry{
+ a4paper,
+ total={175mm,265mm},
+ left=15mm,
+ top=15mm,
+ }
+\usepackage{tikz} %paras poner circulitos dentro de matrices
+\usepackage{tikz-cd}
+\newcommand\Circle[1]{%
+  \tikz[baseline=(char.base)]\node[circle,draw,inner sep=2pt] (char) {#1};}
+
+
+
+  
+ 
+\newenvironment{cframed}[1][blue]
+  {\begin{tcolorbox}[colframe=#1,colback=white]}
+  {\end{tcolorbox}}
+
+\begin{document}
+
+\title{Inferencia estadística \\
+\large{Tarea 3  }}
+\author{ J. Antonio García, jose.ramirez@cimat.mx}
+
+%\newpage
+\maketitle
+\begin{enumerate}
+\begin{cframed}[violet]
+\item 
+Sean $X_1,\dots, X_n \sim \Gamma( \alpha, \beta$). Encuentra el estimador de  $\alpha$ y $\beta$ mediante el
+método de momentos. 
+\end{cframed}
+
+Igualamos el primer momento de la distribución con el primer momento muestral:
+\begin{equation}
+\begin{split}
+\mu_1'  = m_1' \\
+ \Leftrightarrow  \\
+\alpha \beta =  \sum_{i=0}^n\frac{X_i}{n} = \bar{X}
+\end{split}
+\end{equation}
+Por otro lado, al hacer lo mismo para el segundo momento tenemos:
+Tenemos que $\alpha = \frac{\bar{X}}{\beta}$ y sustituyendo este valor en dos obtenemos:
+
+
+\begin{equation}
+\begin{split}
+\mu_2'  = m_2'\\ 
+ \Leftrightarrow  \\
+\alpha \beta^2 =  \sum_{i=0}^n\frac{(X_i- \bar{X})^2}{n} = S_n^2
+\end{split}
+\end{equation}
+De (1) enemos que $\alpha = \frac{\bar{X}}{\beta}$ y sustituyendo este valor en (2) obtenemos:
+\[
+\begin{split}
+\alpha \beta ^2 & =  \frac{\bar{X}}{n}\beta^2 = \bar{X}\beta = S_2^2\\
+				& \Rightarrow \beta = \frac{S_n^2}{\bar{X}} = \frac{\sum_{i=0}^n(x_i -\bar{X})}{\sum_{i=0}^nx_i} \\
+                & \Rightarrow \alpha = \frac{\bar{X}}{\frac{S_n^2}{\bar{X}}} = \frac{(\sum_{i=i}^nx_i)^2}{n\sum(x_i - \bar{X})^2}
+\end{split}
+\]
+
+\begin{cframed}[teal]
+\item Comparaciónn de dos tratamientos. A $n_1$ personas se les da el tratamiento 1 y a $n_2$ personas se les da el tratamiento 2. Sea $X_1$ el número de personas en tratamiento 1 que responden de manera favorable al tratamiento, y $X_2$ el número correspondiente de personas en tratamiento 2 que responden favorablemente. Asume que $X_1 \sim Binomial(n_1, p_1)$ y $X_2 \sim  Binomial(n_2 ,p_2)$.\\ Sea  $\psi = p_1 - p_2$.
+\end{cframed}
+
+\begin{enumerate}
+\item Encuentra el MLE $\hat{\psi}$   para $\psi$.\\
+Como vimos rápidamente en clase, y como es probado en el libro de Casella G. y Berger R. L . (Statistical Inference) en la pág. 294 (en la sección de máxima verosimilitud), los estimadores de máxima verosimilitud son equivariantes independientemente de la dimensión del espacio de parámetros. \\
+Entonces si consideramos a $\psi$ como una función de los parámetros $p_1$ y $p_2$ tenemos:\\
+\begin{equation*}
+\begin{split}
+{\psi} &= \psi(p_1, p_2) = p_1 – p_2 \\
+		& \Rightarrow \hat{\psi} = \hat{p_1} - \hat{p_2} = \frac{n_2X_1-n_1X_2}{n_1n_2}
+\end{split}
+\end{equation*}
+
+\item
+Encuentra la matriz de información de Fisher $I(p_1, p_22)$.\\
+Como los parámetros $p_1$ y $p_2$ son independientes su función de distribución conjunta es el producto de sus distribuciones por separado consideremos la función de likelihood con una muestra de tamaño uno.
+
+\begin{equation}
+\begin{split}
+L(p_1, p_2 ) & = L(x;p_1, p_2 )  = L(x; p_1)L(x;p_2) \\
+& \Rightarrow \ln L(p_1,p_2) = \ln L(x;p_1) + \ln  L(x;p_2)
+\end{split}
+\end{equation}
+
+Si derivamos lo anterior con respecto a $p_i$:\\
+\begin{equation}
+\begin{split}
+\frac{\partial\ln L(p_1,p_2)}{\partial p_i} & =
+\frac{\partial\ln {{n_i}\choose{x}} p_i^x(1-p_i)^{n_i-x} } {\partial p_i} \\
+&= \frac{\partial}{\partial p_i} ( (\ln (n_i! ) - \ln((n_i-x)! ) - \ln(x!) ) +x\ln p_i + (n_i - x)\ln (1-p_i) )  \\
+& = \frac{\partial}{\partial p_1} ( C_i + x\ln p_1 + (n_i - x)\ln (1-p_i) ) \\
+& = \frac{x}{p_i} - \frac{n_i-x}{1-p_i} = \frac{x-n_ip_i}{p_i(1-p_i)}
+\end{split}
+\end{equation}
+
+
+\end{enumerate}
+
+
+\begin{cframed}[teal]
+\item Sea la matriz $A \in M_{3x3}(\mathbb{R})$
+\[ A = \begin{pmatrix}
+	7&-4&0\\
+	8&-5&0\\
+	6&-6&3
+	\end{pmatrix}\]
+Determine si A es diagonalizable y si lo es, encuentre una matriz invertible P y una matriz diagonal D tal que $A = PDP^{-1}$.
+\end{cframed}
+
+\end{enumerate}
+\end{document}

@@ -1,0 +1,15 @@
+---
+title: "Theory"
+output: 
+  html_document:
+    mathjax: "http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"
+---
+
+
+# Consideremos la hipotesis $H_0:$ como que el modelo reducido dice la verdad
+
+## Nuestro modelo actual (obtenido por exhaustivos analisis) esta dado por 
+
+\[
+ Y_{mpg} =  \alpha_0 + \alpha_1X_{disp}+\alpha_2X_{drat}
+\]

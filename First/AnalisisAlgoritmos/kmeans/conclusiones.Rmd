@@ -1,0 +1,18 @@
+---
+title: "Datos"
+output: 
+  html_document:
+    mathjax: "http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"
+---
+
+# Comparación frente a la implementación estándar.
+
+Una implementada en R y la otra mostrada en el tap anterior construida con el package *Rcpp*, se implementaron para este bonito proyecto.
+
+Primero se implementó el método de kmeans con lenguaje R, haciendo uso lo menor posible de sus capacidades de vectorización, la que  llamamos *FooKmeans* y a partir de ella construir la implementación hecha con *Rcpp* a la cual llamamos *CFooKmeans*.
+
+La implementación de *FooKmeans* en contraparte no requiere de hardcodear el parámetro $k$, y se incluye el código al final de ésta tab.
+Finalmente mostramos el desempeÃ±o de las tres implementaciones, de donde podemos ver que la implementación en la que se centro este bonito proyecto tiene un mejor desempeño.
+  
+Para controlar el detalle de que los tres métodos no tienen el mismo criterio de paro, fijamos el impuesto por la implementación del kernel base de *R*.
+

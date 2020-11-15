@@ -1,0 +1,540 @@
+%\PassOptionsToPackage{spanish,english}{babel}
+\documentclass[letter]{memoir} %Tipo de papel
+\usepackage[T1]{fontenc}		%Previene errores en el encoding
+\usepackage[utf8]{inputenc}		%para identificar acentos(encoding)
+\usepackage[spanish]{babel}		%cambiar idioma de las etiquetas
+\decimalpoint
+\usepackage{float}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{longtable}
+\usepackage[unicode=true,pdfusetitle,
+            bookmarks=true,bookmarksnumbered=false,bookmarksopen=false,
+            breaklinks=false,pdfborder={0 0 1},backref=false,colorlinks=false]
+{hyperref}
+\usepackage{breakurl}
+\usepackage{geometry}
+
+ \geometry{
+ a4paper,
+ total={175mm,265mm},
+ left=15mm,
+ top=15mm,
+ }
+\usepackage{tikz} %paras poner circulitos dentro de matrices
+\usepackage{tikz-cd}
+\newcommand\Circle[1]{%
+  \tikz[baseline=(char.base)]\node[circle,draw,inner sep=2pt] (char) {#1};}
+
+\begin{document}
+
+\title{\textbf{Álgebra matricial
+ \\Tarea 4 }}
+
+\begin{center}
+\author{J. Antonio Garc\'ia, jose.ramirez@cimat.mx}
+\end{center}
+%\newpage
+\maketitle
+\begin{enumerate}
+
+\item 
+Sea $F$ una matriz fija de $3\times2$ y sea 
+\[
+	H = \{A \in M_{2\times4}(\mathbf{R}) | FA = 0 \}
+\]
+Determine si $H$ es un subespacio de $M_{2\times4}(\mathbf{R})$ \\
+--*--*-- \\\\
+Encontré dos maneras de determinar lo anterior, la primera consiste en ver que $H$ es un subespacio vectorial de $M_{2\times4}(\mathbf{R})$, probando que contiene al cero y es cerrado bajo suma y mutiplicación por escalares, lo cual es sencillo de verificar :\\
+\begin{enumerate}
+\item $H$ contiene al cero de $M_{2\times4}(\mathbf{R})$ pues $F 0  = 0 $
+\item $H$ es cerrado bajo la suma debido a que :\\
+Si $A_1,A_2 \in H$, entonces 
+\begin{equation*}
+\begin{split}
+F(A_1+A_2) =   FA_1 + FA_2 = 0+0 = 0
+\end{split}
+\end{equation*}
+Donde la primer igualdad se tiene por la distributividad de la suma en $M_{2\times4}(\mathbf{R})$ y la segunda por la definición de $F$.
+\item $H$ es cerrado bajo la multiplicación por escalares:\\
+Si $A_1 \in M_{2\times4}(\mathbf{R})$ y $\lambda \in \mathbf{R} $ se tiene:\\
+\[
+	F\left( \lambda A_1 \right) = \left(F \lambda \right) A_1 = \lambda (FA_1) = \lambda0 = 0  
+\]
+Donde la primer igualdad se tiene por la asociatividad de matrices, la segunda por la conmutatividad del campo y la tercera por la definición de $H$
+\end{enumerate}
+La otra manera de mirar el enunciado es observar a $F$ como una función lineal de $\mathbf{R}^2 \rightarrow \mathbf{R} ^3$ y pensar que $F$ mapea a los vectores columna de $A$, que viven en $\mathbf{R}^2$ a vectores en $\mathbf{R}^3$, entonces $H$ se corresponde con el espacio nulo de $F$ que como vimos en clase es un subespacio.
+\item Encuentre $\mathcal{N}$, donde 
+	\[
+			A= \left( 
+            \begin{array}{ccccc}
+            1 & -4 & 0 & 2 & 0\\
+            0 & 0  & 1 & -5& 0 \\
+            0 & 0  & 0 & 0 & 2\\
+			\end{array}
+					\right)
+		\]
+--*--*--\\\\
+Por definición de $\mathcal{N}$ estamos interesados en encontrar los vectores $w_f\in \mathbf{R}^5$ tales que $Aw_f=0$ pero ello es equivalente a resolver el sistema de ecuaciones definido por 
+\begin{equation}\label{nulidad}
+Aw_f = 0
+\end{equation}
+Lo cual se puede lograr utilizando el método de Gauss (como muchas otras cosas que hemos visto en el curso), aprovechando la estructura de $A$ notamos que ya se encuentra en forma escalonada superior, y de hecho tiene tres pivotes en las posiciones $(1,1),(2,3)$ y $(3,5)$ por lo que la solución  general de \ref{nulidad} es de la siguiente forma:
+
+\[
+w_f = \left( \begin{array}{c}
+				x_1\\ \frac{x_1}{4}\\ x_3\\ \frac{x_3}{5} \\ 0x5
+			\end{array} \right) =
+            x_1\left( \begin{array}{c}
+				1 \\ 1 \\ 0 \\ 0\\ 0
+			\end{array} \right) + 
+            x_3\left( \begin{array}{c}
+				0 \\ \frac{1}{10} \\ 1 \\ \frac{1}{5} \\ 0
+			\end{array} \right) + 
+            x_5\left( \begin{array}{c}
+				0 \\ 0 \\ 0 \\ 0 \\ 0
+			\end{array} \right)            
+\]
+
+\item Encuentre $A$ tal que $W = \mathcal{C}(A)$, donde 
+	\[
+			W = \left\{ 
+            \begin{array}{cc}
+            \left(
+            \begin{array}{c}
+             2s+t \\
+             r-s+2t\\
+             3r+3\\
+             2r-s-t\\
+         
+            \end{array}
+            \right)
+            \vline
+            r,s,t \in \mathbf{R}{}
+            \end{array}
+					 \right\}
+		\]
+Encuentre la dimensión de $W$.\\
+--*--*--\\\\
+Estamos interesados en encontrar una matriz $A$ que cumpla $Ay = w$, con $w\in W$, es decir que estamos interesados en plantear $A$ de tal manera que $Ay = w$. Después de notar que $W$ es un subespacio trasladado por el vector $v^t = (0,3,0,0)$ podemos plantear la condición anterior en encontrar los vectores $x$ que satisfagan:
+\begin{equation*}
+Ax+v = w \\ 
+\leftrightarrow \\
+Ax = w-v 
+\end{equation*}  
+Con lo anterior propongo la matriz $A$ de la siguiente manera: \\
+\[
+			A= \left( 
+            \begin{array}{ccc}
+            0 & 2 & 1 \\
+            1 & -1 & 2 \\
+            3 & 0& 0 \\
+            2 & -1 & -1
+            \end{array}
+					\right)
+		\]
+ Luego de aplicar Gauss sobre $A$ tenemos su forma escalonada superior : 
+\[
+E_{43}\left(\frac{1}{5}\right)E_{32}\left(\frac{1}{2}\right)E_{31}\left(\frac{-1}{3}\right)E_{12}E_{23}A = \left(\begin{array}{ccc}
+					\Circle{3} & 0& 0 \\
+                    0 &\Circle{2} & 1\\
+                    0 & 0& \Circle{5/2} \\
+                    0 & 0&0 
+					\end{array} \right)
+\]
+Finalmente podemos mencionar que al utilizar el método de Gauss sobre la matriz $A$ propuesta, esta tiene tres pivotes (marcados con un círculo cada uno) por lo que el espacio columna de $A$, $\mathcal{C}(A)$ tiene dimensión tres. 
+
+\item Determine si los vectores $(1,0,-3),(3,1,-4),(-2,-1,1)$ forman una base de $\mathbf{R}^3.$\\
+--*--*--\\\\
+Construyamos una matriz, donde los vectores dados sean columnas de ella: 
+	\[
+			C= \left( 
+            \begin{array}{ccc}
+            1 & 3 & -2 \\
+            0 & 1 &-1 \\
+            -3 & -4 &1 
+         	\end{array}
+					\right)
+		\]
+Esta matriz la podemos reducir usando Gauss y encontrar las columnas que son linealmente independientes (las columnas en los que se encuentran los pivotes, siendo así tenemos: 
+	\[
+    		E_{32}\left(-5\right) E_{21}\left( 3\right)C = 
+			 \left( 
+            \begin{array}{ccc}
+            \Circle{1} & 3 & -2 \\
+            0 & \Circle{1} &-1 \\
+            0 & 0 & 0 
+         	\end{array}
+					\right)
+		\]
+Por lo que de los vectores dados, el tercero es combinación lineal de los otros dos por lo que el conjunto de vectores dados no es base.\\
+
+\item Dada la matriz
+	\[
+			A= \left( 
+            \begin{array}{cccc}
+            -2 & 4 & -2 & -4 \\
+            2  & -6 & -3 & 1 \\
+            -3 & 8& 2 & -3
+         	\end{array}
+					\right)
+		\]
+encuentre bases para $\mathcal{N}(A), \mathcal{C}(A)$ y $\mathcal{R}(A)$. Encuentre el rango de $A$, la nulidad de $A$ y la dimensión de $\mathcal{R}(A)$.\\
+--*--*--\\\\
+Primero encontremos una base para $\mathcal{R}(A)$, la construimos encontrando los vectores linealmente independientes en las columnas de $A^t$, para lo cual utilizamos el método de Gauss:
+\[
+	A^t = \left( 
+            \begin{array}{ccc}
+            -2 & 2& -3\\
+            4 & -6 & 8\\
+            -2 & -3 & 2\\
+            -4 & 1 & -3
+            \end{array}
+		\right)
+\]
+Al reducir $A^t$ obtenemos:\\
+\[
+	E_{42}\left( \frac{-3}{2} \right) E_{32}\left( \frac{-5}{2}\right) E_{41}(-2) E_{31}(-1) E_{21}(2) A^t = \left( 
+            \begin{array}{ccc}
+            \Circle{-2} & 2& -3\\
+            0 & \Circle{-2} & 14\\
+            0 & 0 & 0\\
+            0 & 0 & 0
+            \end{array}
+		\right)
+\]
+
+Con lo que el par de vectores $\{(-2,4,-2,-4),(2,-6,-3,1)\}$ es una base de $\mathcal{R}(A)$.\\
+Sabemos que la dimensión del espacio reglón es la misma que la del espacio columna por lo que buscamos ahora las dos columnas que son linealmente independientes en la matriz original $A$, usando Gauss obtemos esas columnas:
+\[
+	E_{32}\left( 1 \right) E_{31}\left( \frac{-3}{2}\right) E_{21}(1)  A = \left( 
+            \begin{array}{cccc}
+            \Circle{-2} & 4 & -2 & -4\\
+            0 & \Circle{-2} & -5 & -3\\
+            0 & 0 & 0 &0 
+            \end{array}
+		\right) = A^*
+\]
+Con lo que obtenemos que el conjunto $\{(-2,2,-3),(4,-6,8)\}$ es una base de $\mathbf{C}(A)$.\\
+Por ultimo para encontrar una base de $\mathcal{N}(A)$, partimos de la matriz reducida del punto anterior, al resolver el sistema homogéneo de esta matriz reducida $A^*$ 
+\begin{equation}\label{nulidad2}
+ A^*x = 0
+\end{equation}
+Obtendremos el espacio nulo de $A$ lo cual equivale a solucionar el sistema anterior, las soluciones \ref{nulidad2} son de la forma: \\
+\[
+	x= x_1\left( 
+            \begin{array}{c}
+             1\\ {1}/{2} \\ {-1}/{6} \\ 0
+            \end{array}
+		\right) +
+        x_2\left( 
+            \begin{array}{c}
+             0\\ {1}/{2} \\ 0 \\ 0
+            \end{array}
+		\right)
+\]
+Como $\{(1,1/2,-1/6,0), (0,1/2,0,0)\}$ es un conjunto linealmente independiente sirve como base para $\mathcal{N}(A)$
+
+
+
+\item Encuentre las coordenadas del vector $(8,-9,6)$ respecto a la base $\mathcal{B} = \{b_1,b_2,b_3\}$ de $\mathbf{R}^3$ donde $b_1 = (1,-1,-3), b_2 = (-3,4,9)$ y $b_3 = (2,-2,4)$.\\\\
+--*--*--\\
+Consideremos el vector $v = (8,-9,6)$ el cual se encuentra expresado en la base canónica $e$, podemos escribir $[v]_e$ para expresar lo anterior. Por otro lado podemos denotar a la matriz de cambio de base, que manda la base canónica en la base $B$, construida por los vectores $b_i$ como columnas es decir  $[B]_e^B = [b_1,b_2,b_3]$.\\
+Con lo anterior tenemos que el vector $v$ expresado en la base $B$, que denoto como $[v]_B$ está dado por:
+\[
+[v]_B=[B]_e^B[v]_e = \left( 
+            	\begin{array}{ccc}
+             	1 & -3 & 2 \\
+                -1 & 4& -2 \\
+                3 & 9 & 4
+            	\end{array}
+				\right)
+                \left( 
+            	\begin{array}{c}
+             	8 \\
+                -9 \\
+                6
+            	\end{array}
+				\right) =                 
+                \left( 
+            	\begin{array}{c}
+             	47\\-56\\33
+            	\end{array}
+                \right)
+\]
+
+\item Suponga que las soluciones de un sistema lineal homogéneo de 5 ecuaciones y 6 incógnitas son todas múltiplos de de una solución que no es cero, ¿El sistema tendra solución para cualquier elección de constantes en el lado derecho de las ecuaciones? Explique su respuesta.\\\\
+--*--*--\\
+Estamos interesados en la forma del vector $b$ en la expresión:\\
+\begin{equation}\label{sol}
+Ax = b
+\end{equation}
+Ahora bien por las condiciones del enunciado sabemos que existen vectores solución de \ref{sol} , de tal forma que $Ax = 0$ con $x\ne 0$.\\
+Por lo que si en la expresión \ref{sol} consideremos un vector $x \in \mathcal{N}(A)$ el lado derecho de la ecuación es cero lo que obliga a que $b$ sea igual al vector 0. \\
+Mientras que si consideramos un vector $x \notin \mathcal{N}(A)$ el sistema $\ref{sol}$ tiene solución.\\
+Lo importante en el punto anterior es observar que el conjunto $G = \{x| x \notin \mathcal{N}(A) \}$ es diferente del vacío, lo cual es verdad pues como sabemos $\rho(A) + \eta(A) = 6$ por lo que la dimensión del espacio columna, $\mathcal{C}(A)$ esta entre 5 y 1.\\
+Así que basta con considerar a $b \in \mathcal{C}(A)$ para que \ref{sol} tenga solución, en otro caso el sistema no lo tiene. 
+
+
+\item Dadas las bases $\mathcal{B} = \{ (7,5),(-3,1) \}$ y $C=\{(1,-5), (-2,2)\}$ de $\mathbf{R}^2$, encuentre la matriz de cambio de base de $\mathcal{B}$ a $\mathcal{C}$ y la matriz de cambio de base de $\mathcal{C}$ a \textbf{$\mathcal{B}$}.\\\\
+--*--*--\\
+Usando la notación del inciso 6, podemos interpretar a las matrices $B$ y $C$ cada una como matrices de cambio de base. Si representando a las coordenadas (usando la base canónica) de un vector  $v$ como $[v]_e$ y $[v]_B$ como las coordenadas del vector $[v]_e$ al efectuar el cambio de base $B$ podemos escribir que la matriz de cambio de base de $B\Rightarrow C$ esta dada por la tranformación $P$ que opera de la siguiente forma:
+\[ [P]_B^C = [C]_e^C[B^{-1}]_B^e[v]_B\]
+Con lo cual tenemos que 
+\[
+P = CB^{-1} = \left( \begin{array}{cc}
+					1 & -2 \\
+                    -5 & 2
+				\end{array} \right)
+                \left( \left(\begin{array}{cc}
+					-1 & 3 \\
+                    -5 & 7
+				\end{array} \right) \left( \frac{1}{8}\right) \right) =
+                \left(\begin{array}{cc}
+					9 & -11 \\
+                    -5 &-1
+				\end{array} \right) \left( \frac{1}{8}\right)
+\] 
+
+Y la matriz de cambio de base de $C\rightarrow B$, $G = [G]_B^C$ se puede obtener invirtiendo $P$, es decir $G = P^{-1}$ o bien de la siguiente forma:
+\[
+G = P^{-1} =(CB^{-1})^{-1} = BC^{-1} = \left( \begin{array}{cc}
+					7 & -3 \\
+                    5 & -1
+				\end{array} \right)
+                \left( \left(\begin{array}{cc}
+					2 & 2 \\
+                    5 & 1
+				\end{array} \right) \left( \frac{-1}{8}\right) \right) =
+                \left(\begin{array}{cc}
+					-1 & 11 \\
+                    5 & 9
+				\end{array} \right) \left( \frac{-1}{8}\right)
+\] 
+
+
+\item Sea $F$ la matriz por bloques
+\[
+			F= \left( 
+            \begin{array}{cc }
+            A & B \\
+            0 & E
+          	\end{array}
+					\right)
+		\]
+Demuestre que 
+\begin{equation} \label{nueve}\rho(F) \geq \rho(A) +\rho(E)
+\end{equation}. De un ejemplo donde la desigualdad sea estricta. \\\\
+--*--*\\
+Para esta prueba hare uso, en repetidas ocasiones, del hecho de que el rango de una matriz es el número de columnas o reglones linealmente independientes de un matriz, entonces si $F’$ se obtiene de $F$ aplicando una operación elemental el rango de ambas matrices es igual (es decir que la matrices utilizadas en el pivoteo utilizado en la factorización $LU$ comparten el rango).\\\\
+Sin perdida de generalidad asumamos $A\in M_{m,n}(\mathbf{R}),E\in M_{p,l}(\mathbf{R})$.\\\\
+Entonces podemos tomar como pivote toda la matriz $E$ para hacer ceros todas las columnas de $B$ que se puedan; las cuales son $\rho(E)$ ( y como $\rho(E)+\eta(E) = p$) las vectores columna no cero de $B$ (después de pivotear) son $\eta(E)$ (denotados por $b_1,...,b_{\eta(E)}$) al igual que los vectores columa no cero de $E$ ($e_1,...,e_{\rho(E)}$), obteniendo la siguiente matriz: 
+\[
+			 \left( 
+            \begin{array}{cc }
+            A \vline & \begin{array}{cccc}
+            0 & b_1 &  \dots & b_{\mu(E)}\\            
+            \end{array} \\
+            \hline
+            0 \vline & \begin{array}{cccc}
+            1_{\rho(E)} & e_1 &  \dots & e_{\mu(E)}\\            
+            \end{array} \\
+          	\end{array}
+					\right)
+		\]
+Transponemos la matriz anterior:
+\[
+			 \left( 
+            \begin{array}{cc }
+            A^t \vline & 0  \\
+            \hline
+            \begin{array}{c}
+            0   \\
+            -b_1- \\
+             \dots \\
+             -b_{\mu(E)}- \\            
+            \end{array} \vline 
+            & 
+            \begin{array}{c}
+            1_{\rho(E)} \\
+            -e_1-\\
+            \dots\\
+            -e_{\mu(E)}-\\            
+            \end{array} \\
+          	\end{array}
+					\right)
+		\]
+        
+Ahora tomamos como pivote a toda la matriz $A$ para hacer ceros debajo de ella,
+\[
+			 \left( 
+            \begin{array}{cc }
+            \begin{array}{cccc}
+            I_{\rho(A)} & a1 & \dots & a_{\eta(A)}   \\
+            \end{array} \vline & 0 \\
+            \hline
+            \begin{array}{c}
+            0    \\
+            0,...,0,b_{1,\rho(A)+1},b_{1,\rho(A)+2},...,b_{1,m}  \\
+           ...\\
+        0,..,0,b_{\eta(E),\rho(A)+1},b_{\eta(E),\rho(A)+2},...,b_{\eta(E),m}  \\
+            \end{array} \vline &
+            \begin{array}{c}
+            I_{\rho(E)} \\
+            -e_1-\\
+            \dots\\
+            -e_{\rho(E)}
+      		\end{array}
+          	\end{array}
+					\right)
+		\]
+Donde lo importante es notar que las entradas $b_{k,\rho(A)+1},b_{k,\rho(A)+2},...,b_{k,m}$, con $k \in 1,..,\eta(E)$ son las entradas que no necesariamente se hacen cero después de los dos pivoteos, podemos escribir este arreglo de entradas como $B^*$ y notemos que es de dimensión $\eta(E) \times \eta(A)$. Transponemos nuevamente para visualizar los resultados en la misma forma que la matriz original
+\[
+			 \left( 
+            \begin{array}{cc }
+            \begin{array}{c}
+            I_{\rho(A)} \\ -a1- \\ \dots \\ -a_{\eta(A)-}   \\
+            \end{array} \vline &
+\begin{array}{cc}
+0 & 0\\
+0 & B^* \\
+\end{array}\\
+\hline
+            \begin{array}{c}
+            0    \\
+            \end{array}  &\vline
+            \begin{array}{cc}
+            I_{\rho(E)} & \begin{array}{ccc} 
+            e_1 & \dots & e_{\rho(E)}
+            \end{array}
+             \end{array}
+            \\
+          	\end{array}
+					\right)
+		\]
+Así que si prestamos atención a la matriz a la que se logro reducir la matriz $B$ original, la cual se encuentra en la parte superior derecha de la última matriz presentada, podemos ver que su rango es precisamente el rango de $B^*$ como construimos $B^*$ (con las entradas no cero de las columnas linealmente independientes)  $\rho(B^*) = min(\eta(A), \eta(E))$\\\\
+También con la partición anterior es sencillo ver que el espacio columna de $F$ es el mismo que se genera con las columnas de la última partición (pues la intersección del generado de estos es vacia) donde los conjuntos columna son lo que esta por debajo de $I_{\rho(A)}$, lo que esta por encima de $I_{\rho(E)}$ y lo que esta por encima y debajo de $B^*$ lo cual tiene rango  $min(\eta(A), \eta(E))$
+Entonces tenemos que \[\rho(F) = \rho(A) + \rho(E) + \rho(B^*) =\rho(A) + \rho(E) + min(\eta(A), \eta(B))  \]
+Como en particular $min(\eta(A), \eta(B)) \geq 0$ se tiene la desigualdad que queriamos probar.
+El ejemplo donde se da la desigualdad estricta es:\[
+\left( \begin{array}{cccccc}
+40 & 0 \vline & 0 & 0& 0 & 0\\ 
+0 & 1 \vline & 0 & 0& 0 &0\\
+1 & 1 \vline & 0 & 0& 0 &1\\
+\hline
+0 & 0 \vline & 1 & 0& 0 & 0\\ 
+0 & 0 \vline & 0 & 1& 0 & 0\\
+0 & 0 \vline & 0 & 0& 1 & 0\\ 
+
+
+
+
+\end{array}
+\right)
+\]
+\[
+\rho(F) = 6 > 2 + 3 = \rho(A) + \rho(E)
+\]
+
+
+\item Sea $A$ de tamaño $m \times n$ y $B$ de tamaño $n\times p $. Demuestre que $\rho(AB) \geq \rho(A) + \rho(B) -n$. \\
+--*--*--\\\\
+Consideremos la matriz $AB^* \in \mathcal{R}^r$ con $r = max{n,p,m}$, construida como colocando en la parte inferior izquerda a $AB$ y llenando con ceros lo démas 
+\[
+AB^* = \left( \begin{array}{cc}
+0 & 0 \\
+0 & AB  \\ 
+\end{array}
+\right)
+\]
+ Y por otro lado consideremos la matriz cuadrada $I_{foo}$ de dimensión $r \times r$ construida colocando en el lado superior izquierda la matriz $I_n$,
+\[
+I_r = \left( \begin{array}{ccc}
+I_n & 0 \\
+0 & 0  \\ 
+\end{array}
+\right)
+\]
+
+Entonces Consideremos la matriz $F'$ como sigue
+\[
+F' = \left( \begin{array}{ccc}
+I_r & 0 \\
+0 & AB^*  \\ 
+\end{array}
+\right)
+\]
+
+Como argumento en el ejercicio anterior, $\rho(F') = n +\rho(AB^*) n +\rho(AB) $
+
+Entonces podemos tomar como pivote la primer columna de $F'$ multiplicarla por $A$ y sumarla a la segunda columna para obtener  
+\[
+ \left( \begin{array}{ccc}
+I_r & A \\
+0 & AB^*  \\ 
+\end{array}
+\right)
+\]
+Y de nuevo podemos sumar al segundo reglón, de la matriz anterior, el primero multiplicado por $-B$ a la derecha y obtenemos
+\[
+ \left( \begin{array}{ccc}
+I_r & A \\
+-B & 0  \\ 
+\end{array}
+\right)
+\]
+Y multiplicamos por (-1) el segundo reglon para obtener
+\[
+ \left( \begin{array}{ccc}
+I_r & A \\
+B & 0  \\ 
+\end{array}
+\right)
+\]
+Como mencione, también en el ejercicio anterior, la matriz anterior tiene el mismo rango que $F$ y como el rango se mantiene después de permutar columnas, entonces reordeno la matriz anterior 
+\[
+ \left( \begin{array}{ccc}
+A& I_r \\
+0 & B  \\ 
+\end{array}
+\right)
+\]
+Y aplico el resultado del ejercicio anterior por lo que 
+\begin{equation}\label{ramon}
+	n +\rho(AB) = \rho(F)= \rho(F') \geq \rho(A) + \rho(B) 
+\end{equation}
+Estrictamente la igualdad anterior hace referencia a el rango de las matrices $A$ y $B$ aumentadas con ceros para que las multiplicaciones anteriores tengan sentido, pero estas matrices aumentadas tienen el mismo rango que $A$ y $B$ respectivamente.
+Y de la desigualdad \ref{ramon} tenemos el resultado que requiere el ejercicio.\\
+\item Sean $x_1,x_2, \dots, x_r$ linealmente independientes en $\mathbf{R}$. Si $A$ es una matriz $n\times n$ invertible, demuestre que $Ax_1, Ax_2, \dots, Ax_r$ son linealmente independientes.\\
+--*--*--\\\\
+Partamos de que los vectores $x_i$ son linealmente independientes es decir 
+\[0 = \sum_{i=1}^r\lambda_ix_i , l_i\equiv 0 \]
+Y apliquemos $A$ a la combinación lineal anterior para obtener 
+\[0 = A0 = A(\sum_{i=1}^r\lambda_i x_i )=
+\sum_{i=1}^rA(\lambda_ix_i) = \sum_{i=1}^r\lambda_iA(x_i) =\sum_{i=1}^r\lambda_iA(x_i) = \sum_{i=1}^r\lambda_iv_i  
+\]
+
+Ahora bien como $A$ es invertible: el único vector que es mapeado al cero es el mismo cero y las imagenes de $x_i$ bajo $A$, que denotamos como $v_i$ son diferentes por lo que en la última igualdad se mantiene que $l_i \equiv 0$ de donde se mantiene la independencia lineal.
+
+\item Sean $A$ una matriz por bloques $m\times m$, y $B$ una matriz $n\times n$. Si $A$ es invertible, y $F$ es la matriz por bloques \[
+			F= \left( 
+            \begin{array}{cc }
+            A & B \\
+            0 & E
+          	\end{array}
+					\right)
+		\]
+Demuestre que $\rho(F) = \rho(A) +\rho(E)$.\\
+--*--*--\\\\
+Este ejercicio es consecuencia de la respuesta que doy al ejercicio 9, retomemos que se tiene 
+\begin{equation*} 
+\rho(F) = \rho(A) + \rho(E) +\rho(B^*)
+\end{equation*}
+Ahora bien como $A$ es de rango completo (y su rango es $m$) entonces si transponemos $F$ podemos hacer cero todo lo que este debajo de $A^t$ pues $A$ es de rango completo por lo que la matríz $B^*$ (que construyo en el ejercicio 9) solo contiene ceros por lo que su rango es igual a cero,por lo que 
+\begin{equation*} 
+\rho(F) = \rho(A) + \rho(E) + 0
+\end{equation*}
+\end{enumerate}
+ 
+\end{document}

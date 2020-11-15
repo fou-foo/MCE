@@ -1,0 +1,808 @@
+
+\documentclass[peerreview]{IEEEtran}
+%\documentclass[letter]{memoir} %Tipo de papel
+\usepackage[T1]{fontenc}		%Previene errores en el encoding
+
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{amsmath, amsfonts, dsfont}
+\usepackage{graphicx}
+\usepackage[table,xcdraw]{xcolor} %tablas multicolor
+\usepackage{float}
+\usepackage{geometry}
+	\geometry{  a4paper,  total={185mm,265mm},  left=10mm,  top=15mm,right =10mm }
+\usepackage[hidelinks]{hyperref}% Libreria para insertar links
+\usepackage{minted} %packages para color de codigo 
+\decimalpoint
+
+\setlength{\parskip}{5mm}
+\setcounter{section}{-2}
+\newtheorem{theorem}{Teorema}
+\newtheorem{definition}{Definición}
+%%%%%%%%%%%%%%%\PassOptionsToPackage{spanish,english}{babel}
+\usepackage{tcolorbox}  %para resaltar los statements de las respuestas
+%\usepackage{float}
+%\usepackage{amsmath}
+%\usepackage{amssymb}
+%\usepackage{graphicx}
+%\usepackage{longtable}
+%\usepackage[unicode=true,pdfusetitle,
+ %           bookmarks=true,bookmarksnumbered=false,bookmarksopen=false,
+  %          breaklinks=false,pdfborder={0 0 1},backref=false,colorlinks=false]
+%{hyperref}
+%\usepackage{breakurl}
+
+%\usepackage{tikz} %paras poner circulitos dentro de matrices
+%\usepackage{tikz-cd}
+%\newcommand\Circle[1]{%
+ % \tikz[baseline=(char.base)]\node[circle,draw,inner sep=2pt] (char) {#1};}
+
+\usepackage{color,soul} %para subrayar
+%\definecolor{darkblue}{rgb}{0,0,0.5}
+\setulcolor{teal}
+
+
+  
+ 
+\newenvironment{cframed}[1][blue]
+  {\begin{tcolorbox}[colframe=#1,colback=white]}
+  {\end{tcolorbox}}
+%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+\newcommand{\HRule}{\rule{\linewidth}{0.5mm}}
+\input{Portada.tex}
+
+\break
+
+\tableofcontents
+
+%\listoftables
+
+%\listoffigures
+
+\newpage
+\IEEEpeerreviewmaketitle
+\break
+\begin{abstract}
+Se define la prueba de razón de verosimilitudes (LRT), después se demuestra su equivalencia con la prueba de Neyman-Person para probar que la prueba LRT es más potente para hipótesis sencillas, en el caso de hipótesis simples sin parámetros \textit{ nuisance} se trabaja un ejemplo. Posteriormente se prueba que LRT es uniformemente más potente para hipótesis simples, se trabajan dos ejemplos en este caso con parámetros \textit{nuisance}. En la sección más importante, sobre resultados asintóticos, se demuestra que el estadístico asociado a LRT ($2\Lambda(x)$) se distribuye como una $\chi^2$ y se generaliza para el caso en que el parámetro sobre el que se hace inferencia es un vector. Los ejemplos muestran la relación de la LRT con otras pruebas y en el último de ellos se  implemento una aplicación web (usando el ambiente R\cite{R}) para compara modelos lineales.
+
+\end{abstract}
+%\section{Objetivo}
+\section{Motivación}
+\begin{cframed}[violet]
+La prueba de cociente de verosimilitud, por su carácter general, ha sido ampliamente utilizada, se puede decir que juega el mismo papel en pruebas de hipótesis como la máxima verosimilitud en la estimación de parámetros.
+
+De acuerdo con \cite{Rice} (pag.334) \\
+La prueba de razón de verosimilitud es óptima para probar una hipótesis simple contra una hipótesis simple. De hecho en este reporte probaremos que es uniformemente más potente.\\
+
+Más aun la prueba LRT es uniformemente más potente para hipótesis compuestas en el caso de clases de funciones con radio de verosimilitud no decreciente, teniendo como caso particular a la familia de distribuciones exponenciales, de la cual la distribución normal es una de ellas. Lo anterior es sustento de la popularidad de ciertas pruebas para la media y la varianza de dos grupos.
+\end{cframed}
+
+\section{Introducción}
+
+En este reporte se revisa la generalización de esta prueba para su uso en situaciones en las cuales las hipótesis no son simples (ya sea que el espacio de parámetros es de dimensión $1$ o bien un vector). %Tales pruebas no son óptimas generalmente en el sentido de ser uniformemente más potentes (UMP) cuando $\theta$ es un vector (ver \cite{Rohatgi} pág. 476), pero típicamente se desempeñan razonablemente bien las situaciones para las cuales no existen pruebas óptimas.\\
+
+Por ello en la primera subsección de la sección 'LRT' se tratan consideraciones tomando la definición del estadístico (incluyendo el primer ejemplo que se desarrollan en el apéndice A), una tarea importante (y en ocasiones nada sencilla) es la de encontrar la distribución del estadístico $\Lambda(X)$ para poderlo comparar contra una constante $c$ y aceptar o rechazar la hipótesis nula; En aquella subsección se demuestra que la prueba LRT es uniformemente más potente para hipótesis simples. 
+
+La segunda subsección muestra el mismo resultado para hipótesis compuestas restringido a la clase de funciones con razón de verosimilitud no decreciente. En ambas subsecciones se utiliza la relación de LRT con la prueba de Neyman-Pearson y se parte de ella para obtener los resultados.
+
+Posteriormente en la sección 'Resultados asintóticos' se demuestra la distribución asintótica para la prueba LRT en el caso univariado y el análogo multivariado (en el sentido de que $\theta$ es un vector) se enuncia y se da una referencia donde consultar la prueba.
+
+En lo que resta de la introducción se dan algunas definiciones que serán de utilidad.
+
+Partamos de la siguiente definición de \cite{Casella} (pág. 345): 
+\begin{definition}
+Una \textit{hipótesis ,denotada por $H$, es una declaración acerca de un parámetro de una población}.
+\end{definition}
+Si $\theta$ denota el parámetro de la población, la forma general de la hipótesis nula es $H_0 =\theta \in  \Theta$ y $H_1 = \theta \in \Theta^c$ es la forma de la hipótesis alternativa donde tenemos que
+$\Theta$ es el espacio de parámetros donde vive  $\theta$.\\
+Si $X_1, \dots, X_n$ es una muestra aleatoria cuya distribución es $f(x|\theta)$, recordemos que $\theta$ puede ser un vector, la función de verosimilitud se define como:
+\[
+L(\theta | x_1, \dots, x_n)=L(\theta|x)=\prod_{i=1}^n f(x_i|\theta)
+\]
+Si $\Theta_0$ (o $\Theta_1$) contienen solo un punto , decimos que la prueba $\Theta_0$ (o $\Theta_1$) es simple y de otra manera compuesta. Entonces, si la hipótesis es simple la distribución de la muestra está completamente especificada bajo la hipótesis nula.
+\begin{definition}
+Si $\mathbf{X} \sim F_\theta, \theta \in \Theta$. Un subconjunto $C$ de $\mathbf{R}_n$ tal que si $x \in C$, entonces la hipótesis nula $H_0$ es rechazada (con probabilidad 1) es la llamada región crítica (nada restringe a que $C$ sea un conjunto en lugar de un intervalo).
+\[
+C=\{x \in \mathbf{R}_n: H_0 \textrm{ es rechazada si }x \in C\}
+\] 
+\end{definition}
+
+Sabemos que un estadístico de prueba es una función de variables aleatorias, aunque una definición más general se encuentra en \cite{Rohatgi} (pág. 444) pero utiliza conceptos relacionados con medida de Borel.
+\begin{definition}
+Decimos que $\varphi$ es un estadístico de prueba de $H_0: \theta \in \Theta_0$ contrastando la hipótesis alternativa $H_1 :\theta \in  \Theta_1$ con probabilidad de error $\alpha$. Si 
+\[
+\mathbf{E}_\theta \varphi(\mathbf{X}) \leq \alpha \textrm{  para todo  }\theta \in \Theta_0
+\]
+Decimos que $ \varphi$ es una prueba para el problema $(\alpha, \Theta_0, \Theta_1)$
+\end{definition}
+\begin{definition}
+Si $\varphi$ es una prueba para el problema $(\alpha, \Theta_0, \Theta_1)$. Para cada $\theta \in \Theta$ (donde $\Theta$ es el espacio de parámetros . Definimos:
+\[
+\beta_\varphi(\theta)= \mathbf{E}_\theta \varphi (\mathbf{X}) = P_\theta\{ \textrm{ Rechazar }H_0\}
+\]
+Como función de $\theta$, $\beta_\varphi(\theta)$ es llamado el poder de la prueba $\varphi$. Para cada $\theta \in \Theta_1, \beta_\varphi(\theta)$ es llamado el poder de la prueba $\varphi$ en contra la alternativa.
+\end{definition}
+\begin{definition}
+Sea $\Phi_\alpha$ la clase 
+\footnote{
+Para no entrar en controversias de teoría de conjuntos consideramos que una clase es una colección de conjuntos definidos sin ambigüedad por una propiedad en común, en nuestro caso los estadísticos definen un problema ($\alpha$, $\Theta_0$,$\Theta_1$)
+} 
+de todas las pruebas para el problema $(\alpha, \Theta_0, \Theta_1)$. Una prueba $\varphi_0 \in \Phi_\alpha$ se dice que es la prueba más poderosa (MP) contra la alternativa $H_1$ si 
+\[
+\beta_{\varphi_0}(\theta) \geq \beta_\varphi(\theta) \textrm{          para toda     }  \varphi \in \Phi_\alpha
+\]
+\end{definition}
+\begin{definition}
+ Una prueba $\varphi_0 \in \Phi_\alpha$ para el problema $(\alpha, \Theta_0, \Theta_1)$ se dice que es una prueba uniformemente más potente (UMP) si
+\[
+\beta_{\varphi_0}(\theta) \geq \beta_\varphi(\theta) \textrm{          para toda     }  \varphi \in \Phi_\alpha  \textrm{ uniformemente en } \theta \in \Theta_1
+\]
+La condición de uniformidad se puede interpretar como que para cualquier valor del parámetro $\theta \in \Theta_1$ la prueba $\varphi$ sigue siendo MP.
+\end{definition}
+De manera general los UMP frecuentemente no existen por ello se tienen que imponer restricciones a las pruebas de la clase $\Phi_\alpha$ como veremos en la siguiente sección. 
+\section{LRT}
+Si $\Theta$ es el espacio de parámetros completo, el estadístico de la prueba de razón de verosimilitudes (Likelihood Ratio Test) para probar $H_0 : \in \Theta_0$ contra $H_1: \theta \in \Theta_1 = \Theta_0^c$ es 
+\begin{equation}\label{1}
+\Lambda(x) = \frac{ \sup_{\theta_0} L(\theta | x)}{\sup_{\theta} L(\theta | x)}
+\end{equation}
+Es claro que $0 \leq \Lambda \leq 1$, la constante $c$ es determinada por la restricción: 
+\[
+\sup_{\theta_0} P_\theta ( \Lambda \leq c) = \alpha
+\]
+%Esto es precisamente la significancia de la prueba
+Donde $\alpha$ es la significancia deseada.
+
+Entonces si tenemos $\Lambda(x) \leq c$ podemos aceptar $H_0$ (o aceptar $H_1$ en el otro caso), la elección de este valor es un tema que se discutira más adelante.
+
+La prueba se puede interpretar como el cociente, donde le numerador de $\Lambda(x)$ es la probabilidad máxima de la muestra observada, es decir el máximo de la función de verosimilitud evaluada en los valores de los parámetros de la hipótesis nula. El denominador de $\Lambda(x)$ es la probabilidad máxima dada la muestra sobre todo el espació parametral. La razón entre ambas cantidades es pequeña si existe una región perteneciente a la hipótesis alternativa de la cual la muestra observada es más probable que provenga, en lugar de cualquier punto del parámetro en la hipótesis nula.
+
+Podemos pensar en realizar maximización en ambos casos, sobre el espacio de parámetros (maximización no restringida) y sobre un conjunto del mismo espacio (maximización restringida) entonces la correspondencia entre la prueba de razón de verosimilitud (llamémosle LRT) y los estimadores maximoverosimiles (llamémosles MLE)  es más clara. Supongamos que $\hat{\theta}$ es un MLE de $\theta$, este valor es obtenido haciendo una maximización restringida sobre $L(\theta|x)$. También podemos considerar el MLE de $\theta$ pero maximizando sobre el espacio $\Theta_0$, digamos que $\hat{\theta}_0$ es el valor para el cual $\theta \in \Theta_0$ se maximiza. Entonces el estadístico LRT queda como:
+\[
+\Lambda(x) = \frac{L(\hat{\theta}_0|x)}{L(\hat{\theta}|x)}
+\]
+Hasta aquí se ha hablado del estadístico $\Lambda$ considerando hipótesis simples o compuestas. 
+En el segundo ejemplo del apéndice donde se utiliza el LRT y con parámetros $nuisance$, que son parámetros que están presentes en el modelo. La presencia de estos parpametros no afecta la construcción del método LRT pero su presencia pueden conducir a pruebas diferentes.
+Volvamos al enunciado de la motivación. Para lo cual utilizares un par de definiciones y resultados (ver \cite{Rohatgi} cap. 9). 
+\subsection{Propiedades de LRT para hipótesis simples}
+Primero definiremos la prueba de Neyman–Pearson y se prueba que la prueba de Neyman–Pearson es una prueba MP para hipótesis simples (sin importar la dimensión del vector), luego veremos que es equivalente a la prueba de razón de verosimilitud, a continuación se muestra que para una clase restringida de funciones la prueba de Neyman–Pearson es UMP para hipótesis compuestas, por lo que el LRT también lo es para esta clase de funciones.
+\begin{definition}
+Sea $\{f_\theta , \theta \in \Theta \}$ donde $\Theta = \{\theta_0,\theta_1\}$ es una familia de posibles distribuciones de la muestra $\mathbf{X}$. Escribamos $f_0(x)=f_{\theta_0}(x)$ y $f_1(x)=f_{\theta_1}(x)$.
+Una prueba del tipo 	\[
+			\varphi(x)= \left\{ \begin{array}{lr}
+							1 &	\textrm{si  } f_1(x) > kf_0(x) \\
+							\gamma(x)  & \textrm{si  } f_1(x) = kf_0(x) \\ 
+							0 & \textrm{si  } f_1(x) < kf_0(x) \\
+							\end{array}
+					\right.
+		\] 
+Para alguna $k\geq 0$ y $0 \leq \gamma(x) \leq 1$ 
+.Es una prueba de Neyman-Pearson.
+\end{definition}
+\begin{theorem}{ Lema de Neyman–Pearson} 
+\begin{enumerate}
+\item Cualquier prueba de la forma $\varphi$ es la prueba más potente en su tamaño $\alpha$ para probar $H_0: \theta = \theta_0$ contra $H_1: \theta = \theta_1$
+\item Dado $0 \leq \alpha \leq 1$, existe una prueba  $\varphi$ de Neyman-Person con $\gamma(x) = \gamma$ una constante para la cual $\mathbf{E}_{\theta_0}\varphi(\mathbf{X} )= \alpha$  
+\end{enumerate}
+\end{theorem}
+Prueba:\\
+Sea $\varphi$ como en el enunciado y sea $\varphi^*$ cualquier otro estadístico con $\mathbf{E}_{\theta_0}\varphi^*(\mathbf{X} )  \leq \mathbf{E}_{\theta_0}\varphi(\mathbf{X} )$. En el caso continuo 
+\begin{equation}
+\begin{split}
+\int ( \varphi(x) -\varphi^*(x) ) (f_1(x)-kf_0(x))dx =\\   (\int_{f_1>kf_0} + \int_{f_1 < kf_0 } ) ( \varphi(x) -\varphi^*(x) ) (f_1(x)-kf_0(x))dx \\
+\end{split}
+\end{equation}
+Para cualquier $x \in \{ f_1(x) > kf_0(x)\}, \varphi(x) -\varphi^*(x)= 1- \varphi^*(x) \geq 0 $, entonces su integral $\geq 0$. 
+Ahora para cualquier $x \in \{ f_1(x) < kf_0(x)\}, \varphi(x) -\varphi^*(x)= - \varphi^*(x) \leq 0 $, entonces su integral es otra vez $\geq 0$. Se sigue que  
+\begin{equation*}
+\begin{split}
+\int ( \varphi(x) -\varphi^*(x) ) (f_1(x)-kf_0(x))dx = &  \\  
+\mathbf{E}_{\theta_1}\varphi(\mathbf{X} ) - \mathbf{E}_{\theta_1}\varphi^*(\mathbf{X} ) -k(\mathbf{E}_{\theta_0}\varphi(\mathbf{X} ) - \mathbf{E}_{\theta_0}\varphi^*(\mathbf{X} ) )\geq 0 & \\
+\end{split}
+\end{equation*}
+Lo cual implica que 
+\[\mathbf{E}_{\theta_1}\varphi(\mathbf{X} ) - \mathbf{E}_{\theta_1}\varphi^*(\mathbf{X} ) \geq k(\mathbf{E}_{\theta_0}\varphi(\mathbf{X} ) - \mathbf{E}_{\theta_0}\varphi^*(\mathbf{X} ) ) \geq 0
+\] 
+De donde 
+\[
+\mathbf{E}_{\theta_0}\varphi*(\mathbf{X} ) \leq \mathbf{E}_{\theta_0}\varphi(\mathbf{X} )
+\]
+El cambio a v.a. discretas solo implica cambiar las integrales por sumas.\\
+Para el caso $k = \infty $ necesitamos restringirnos a que en la expresión (2) el primer termino desaparece por lo que cualquier prueba $\varphi^*$ de tamaño $0$ debe de desvanecerse en el conjunto $\{ f_0(x) > 0\}$. Teniendo entonces que 
+\[
+\mathbf{E}_{\theta_1}\varphi(\mathbf{X} ) - \mathbf{E}_{\theta_1}\varphi^*(\mathbf{X} ) =\int\limits_{f_0(x)=0} (1 -\varphi^*(x))f_1(x) \geq 0
+\]
+Para la parte 2 del teorema. Sea $\gamma(x)=\gamma$ y calculemos el tamaño de la prueba de la forma del enunciado.
+Tenemos (en el caso $k\ne \infty$) que 
+\begin{equation*}
+\begin{split}
+\mathbf{E}_{\theta_0}\varphi(\mathbf{X} )& = P_{\theta_0}\{f_1(\mathbf{X}) > kf_0(\mathbf{X}) \} +\gamma P_{\theta_0}\{ f_1 ( \mathbf{X}) = kf_0(\mathbf{X})\}\\
+&= 1-P_{\theta_0}\{ f_1(\mathbf{X}) \leq kf_0(\mathbf{X})\}+ \gamma P_{\theta_0}\{ f_1(\mathbf{X} = k f_0(\mathbf{X}) \}
+\end{split}
+\end{equation*}
+Como $P_{\theta_0}\{ f_0(\mathbf{X} )= 0 \}= 0$ (pues la v.a. es continua) podemos escribir 
+\begin{equation*}
+\begin{split}
+\mathbf{E}_{\theta_0}\varphi(\mathbf{X} )= 1-P_{\theta_0}\left\{ \frac{f_1(\mathbf{X})}{f_0(\mathbf{X})} \leq k \right\} + \gamma P_{\theta_0}\left\{ \frac{f_1(\mathbf{X}}{f_0(\mathbf{X})} = k  \right\}
+\end{split}
+\end{equation*}
+Dado que $0 \leq \alpha \leq 1$ queremos encontrar $k$ y $\gamma$ tales que $\mathbf{E}_{\theta_0}\varphi(\mathbf{X} ) =\alpha$, esto es 
+\begin{equation*}
+\begin{split}
+P_{\theta_0}\left\{ \frac{f_1(\mathbf{X})}{f_0(\mathbf{X})} \leq k \right\} + \gamma P_{\theta_0}\left\{ \frac{f_1(\mathbf{X}}{f_0(\mathbf{X})} \leq k  \right\} = 1- \gamma \\
+\end{split}
+\end{equation*}
+Prestemos atencion a  
+%
+\begin{equation}
+\frac{f_1(\mathbf{X})}{f_0(\mathbf{X})} \leq k
+\end{equation}
+Si lo anterior es una función de densidad no decreciente y continua (un hecho que será de gran utilidad para mostrar que LRT es UMP para algunas familias de funciones), entonces existe $k_0$ tal que 
+\begin{equation*}
+\begin{split}
+P_{\theta_0}\left\{ \frac{f_1(\mathbf{X})}{f_0(\mathbf{X})} \leq k_0 \right\}=1-\alpha\\
+\end{split}
+\end{equation*}
+Escojamos $\gamma=0$ y $k=k_0$. En otro caso existe $k_0$ tal que 
+\begin{equation*}
+\begin{split}
+P_{\theta_0}\left\{ \frac{f_1(\mathbf{X})}{f_0(\mathbf{X})} \leq k_0 \right\}=1-\alpha < P_{\theta_0}\left\{ \frac{f_1(\mathbf{X})}{f_0(\mathbf{X})} \leq k_0 \right\} \\
+\end{split}
+\end{equation*}
+Es decir que hay un salto en $k_0$, en este caso podemos elegir $k=k_0$ y 
+\begin{equation*}
+\begin{split}
+\gamma = \frac{P_{\theta_0}\left\{ \frac{f_1(\mathbf{X})}{f_0(\mathbf{X})} \leq k_0 \right\} -(1-\alpha)} { P_{\theta_0}\left\{ \frac{f_1(\mathbf{X})}{f_0(\mathbf{X})} = k_0 \right\}} \\
+\end{split}
+\end{equation*}
+Lo que completa la prueba de que la prueba de Neyman-Pearson es la más poderosa para hipótesis simples ahora bien como hemos mencionado la anterior prueba es equivalente a la LRT pues podemos ver en (3) a $f_1$ como el numerador de $\Lambda$ (pues ambas son funciones de de la muestra) y $f_0$ como el denominador de $\Lambda$ más aun en la formula (3) podemos darnos un idea acerca del papel que juega que el cociente de verosimilitudes sea no decreciente para las propiedades de LRT (sin embargo esto no pasa con todas las familias de funciones). \\
+Por lo tanto, hemos probado la afirmación hecha en el segundo enunciado de nuestra motivación, que LRT es óptimo en el sentido de ser MP.   
+
+Regresando al tema de LRT si $\mathbf{T}(X)$ es un estadístico suficiente para $\theta$ con función de densidad o de masa $g(t|\theta)$ podríamos considerar construir un LRT basado en $T$ y su verosimilitud es decir en $L^*(\theta|t) = g(t|\theta)$, en lugar de la verosimilitud asociada a la muestra $X$, $L(\theta|x)$. Si denotamos como $\Lambda^*(t)$ como el estadístico de la razón de verosimilitud basado en $T$. Dada la idea intuitiva de que toda la información acerca de $\theta$ en $\mathbf{X}$ esta contenida en $T(x)$, la mejor prueba basada en $T$ debe ser tan bueno como el que se basa en la muestra completa $\mathbf{X}$. De hehco las pruebas son equivalentes.
+
+El estadístico $\Lambda(x)$ posee la siguiente propiedad, la cual es útil pues permite encontrar expresiones para $\Lambda(x)$ que sean simplificaciones del cociente original.
+ \begin{theorem}
+Si $\mathbf{T}(X)$ es un estadístico suficiente para $\theta$ y $\Lambda^*(t)$ y $\Lambda(x)$ son los estadísticos de LRT basados en $T$ y $\mathbf{X}$, respectivamente, entonces $\Lambda^*(T(x)) = \Lambda(x)$ para cada $x$ en el espacio muestral.
+\end{theorem}
+La prueba es simple y hace uso del teorema de factorización (que incluimos por completes en el anexo de resultados útiles) .
+Por el teorema de factorización la función de densidad de $\mathbf{X}$ se puede escribir como $f(x|\theta) = g(T(x)|\theta)h(X)$ donde $g(t|\theta)$ es la función de densidad de $T$ y $h(x)$ no depende de $\theta$, entonces 
+\[
+\begin{split}
+\Lambda(x) &= \frac{ \sup_{\theta_0} L(\theta | x)}{\sup_{\theta} L(\theta | x)}\\
+ & = \frac{\sup_{\theta_0} f( x| \theta) }{\sup_{\theta} f( x| \theta)}\\
+ & = \frac{\sup_{\theta_0} g( T(x)| \theta)h(x) }{\sup_{\theta} g( T(x)| \theta)h(x)}\\
+ & = \frac{\sup_{\theta_0} g( T(x)| \theta) }{\sup_{\theta} g( T(x)| \theta)}\\
+ &= \frac{ \sup_{\theta_0} L^*(\theta | x)}{\sup_{\theta} L^*(\theta | x)}\\
+ & = \Lambda^*(T(x))
+\end{split}
+\] 
+El resultado anterior junto con la observación hecha en la conclusión del teorema 1 (el último párrafo) nos permite afirmar el siguiente resultado cuya prueba se pude consultar en \cite{Rohatgi} (pág. 453)
+\begin{theorem}
+Si $T$ es un estadístico suficiente para la familia $\{ f_\theta: \theta \in \Theta\}, \Theta = \{\theta_0, \theta_1\}$, la prueba más poderosa (MP) es función de $T$.
+\end{theorem}
+\subsection{Propiedades de LRT para hipótesis compuestas}
+Para poder extender la prueba LRT a los casos en que la hipótesis nula es compuesta, es decir de la forma $H_0: \theta \leq r$, cuando la distribución de la verosimilitud no esta completamente definida, requerimos de algunos conceptos desarrollados a continuación.
+\begin{definition}
+Sea $\{ f_\theta, \theta  \in \Theta \}$ una familia de distribuciones, con $\theta \subset \mathbf{R}$. Decimos que $\{f_\theta \}$ tiene un radio de verosimilitud monótono (MLR) sobre el estadístico suficiente $T(x)$ si para $\theta_1 < \theta_2$ cualquier $f_{\theta_1},f_{\theta_2}$ distintas, el radio $f_{\theta_2}(x)/ f_{\theta_1}(x)$ es una función no decreciente de $T(x)$ para el conjunto de valores $x$ para los cuales al menos uno de los valores $f_{\theta_2}(x) $ y $f_{\theta_1}(x)$ es mayor a cero.
+\end{definition}
+El siguiente resultado enuncia que la familia exponencial \footnote{Para la definición y ejemplos referimos a \cite{Wasserman} (pág. 140)} de un parámetro (la cual contempla a la distribución normal, binomial Poisson, gamma con un parámetro fijo, beta con un parámetro fijo y otras) posee un cociente de verosimilitudes no decreciente. El resultado ayudara a caracterizar un conjunto de distribuciones para las cuales el LRT tiene UMP al considerar hipótesis compuestas.
+\begin{theorem}
+La familia exponencial de un parámetro 
+\[
+f_\theta(x) = exp\{ Q(\theta)T(x)+S(x)+D(\theta) \}
+\]
+Donde $Q(\theta)$ es no decreciente tiene MLR en el estadístico suficiente $T(x)$
+\end{theorem}
+En vista de que ya conocemos la relación de la  prueba LRT con la prueba de Neyman-Pearson, y de que sus estadísticos son funciones de estadísticos suficientes, podemos enunciar y demostrar el siguiente resultado el cual permitirá emplear LRT para hipótesis compuestas.  
+\begin{theorem}
+Si $\mathbf{X} \sim f_\theta, \theta \in \Theta$ donde $\{f_\theta\}$ posee un MLR en $T(X)$. Para efectuar la pruba $H_0:\theta \leq \theta_0$ contra $H_1:\theta \geq \theta_0, \theta_0 \in \Theta$, cualquier prueba de la forma 
+\begin{equation}
+			\varphi(x)= \left\{ \begin{array}{lr}
+							1 &	\textrm{si  } T(x) > t_0 \\
+							\gamma  & \textrm{si  } T(x) = t_0 \\ 
+							1 & \textrm{si  } T(x) < T_0 \\
+							\end{array}
+					\right.
+\end{equation}
+Tiene un poder no decreciente y de hecho cumple con ser UMP de tamaño $\mathbf{E}_{\theta_0}\varphi(\mathbf{X})=\alpha$
+\end{theorem}
+Prueba:\\
+Sean $\theta_1, \theta_2 \in \Theta$ tales que $ \theta_1 < \theta_2$. Por el lema de Neyman-Pearson cualquier prueba de la forma 
+\begin{equation}
+			\varphi(x)= \left\{ \begin{array}{lr}
+							1 &	\textrm{si  } \lambda(x) >  k\\
+							\gamma(x)  & \textrm{si  } \lambda(x) = k  \\ 
+							0 & \textrm{si  } \lambda(x) < k \\
+							\end{array}
+					\right.
+\end{equation}
+Donde $\lambda(x)= f_{\theta_2}(x)/f_{\theta_1}(x)$ es MP (\ul{notemos que para el objetivo de este reporte esta es la forma de $\Lambda(x)$}) para su tamaño fijo para efectuar la prueba $\theta = \theta_1$ contra $\theta = \theta_2$, siempre que $0 \leq k < \infty$, si $ k = \infty$ la prueba
+\begin{equation}
+			\varphi(x)= \left\{ \begin{array}{lr}
+							1 &	\textrm{si  } f_{\theta_1}=0\\
+							0 & \textrm{si  } f_{\theta_1}=0 \\ 
+\end{array}
+					\right.
+\end{equation}
+Es MP de tamaño cero, por lo que $f_\theta$ posee un MLR en $T(x)$, por lo que cualquier prueba de la forma (4) lo es tambien de la forma (5) siempre que $\mathbf{E}_{\theta_1}\varphi(\mathbf{X}) >0$, esto es cuidando el caso de que el tamaño de la prueba sea mayor a cero. El caso sencillo es cuando otra función $\varphi' \equiv \alpha$ tiene tamaño $\alpha$ y poder $\alpha$, entonces el poder de cualquier test de la forma (4) es al menos $\alpha$ esto es  
+
+\[
+\mathbf{E}_{\theta_2}\varphi(\mathbf{X}) \geq \mathbf{E}_{\theta_2}\varphi ' (\mathbf{X}) = \alpha = \mathbf{E}_{\theta_1}\varphi(\mathbf{X})
+\]
+Se sigue que if $\theta_1 < \theta_2$ y $\mathbf{E}_{\theta_1}\varphi(\mathbf{X})>0$ entonces $\mathbf{E}_{\theta_1}\varphi(\mathbf{X}) \leq \mathbf{E}_{\theta_2}\varphi(\mathbf{X})$ como se esperaba.\\
+Ahora sea $\theta_1 = \theta_0$ y $\theta_2  > \theta_0$ como arriba. Sabemos que las pruebas de la forma (4) son pruebas MP de tamaño $\mathbf{E}_{\theta_0}\varphi(\mathbf{X})$ para probar $\theta = \theta_0$ contra $\theta = \theta_2$ (recordando que suponemos $\theta_2 > \theta_1$, siempre que   $\mathbf{E}_{\theta_0}\varphi(\mathbf{X}) > 0$, en vista de que el poder de la función $\varphi$ es no decreciente 
+\begin{equation}
+		\mathbf{E}_{\theta}\varphi(\mathbf{X}) \leq \mathbf{E}_{\theta_0}\varphi(\mathbf{X}) = \alpha_0 \textrm{    para todo    } \theta \leq \theta_0	
+\end{equation}
+A partir de lo anterior, $\varphi$ no depende de $\theta_2$ ( su dependencia se limita a las constantes $k$ y $\gamma$), se sigue que $\varphi$ es el UMP de tamaño $\alpha_0$ para la prueba de $\theta=\theta_0$ contra $\theta > \theta_0$. En consecuencia $\varphi$ es un UMP sobre la clase de pruebas $\varphi'' $ para las cuales 
+\begin{equation}
+		\mathbf{E}_{\theta}\varphi''(\mathbf{X}) \leq \mathbf{E}_{\theta_0}\varphi(\mathbf{X}) = \alpha_0	
+\end{equation}
+Ahora, la clase de pruebas que satisfacen (7) esta contenida en la clase de funciones que satisfacen (8) (pues hay más restricciones en (7)). Se sigue que $\varphi$, el cual es UMP en la clase satisfaciendo (8) debe de ser también un UMP en la clase definida por (7). Esto prueba que $\alpha_0 > 0$ y que $\varphi$ es el UMP de tamaño $\alpha_0$ para $\theta \leq \theta_0$ contra $\theta > \theta_0$.
+
+Hasta aquí hemos visto que cierta clase de pruebas entre ellas la LRT, que tienen MLR y como caso particular de estas la familia exponencial de un parámetro,  son óptimas en el sentido de ser las más poderosas uniformemente (UMP), como dice la tercer afirmación de nuestra motivación inicial.
+
+Ahora podemos considerar el ejemplo de la prueba $\mu = \mu_0$ contra $\mu \ne \mu_0$ de una muestra aleatoria de tamaño $n$ que provienen de una distribución normal $N(\mu,\sigma^2)$, donde $\mu$ y $\sigma$ son desconocidos. Este ejemplo se desarrolla en la segunda parte del apéndice A y muestra que la famosa prueba $t$ de Student para compara medias es un caso particular de la prueba LRT y que en vista de que la distribución normal es parte de la familia exponencial estas pruebas son UMP.
+
+Con las ideas del párrafo anterior podemos dar otro ejemplo para la prueba $H_0:\sigma_1^2 = \sigma_2^2$ contra $H_1: \sigma_1^2 \ne \sigma_2^2$ de dos muestra aleatorias $X_1,\dots, X_m$ y $Y_1,\dots, Y_n$ que provienen de distribuciones normales $N(\mu_1, \sigma_1^2)$ y $N(\mu_2, \sigma_2^2)$. Este ejemplo se desarrolla en el tercer apartado del apéndice A y muestra, de manera análoga al ejemplo anterior, que la famosa prueba $F$ para comparar varianzas es un caso particular de la prueba LRT que también es UMP por se una prueba sobre la familia exponencial de un parámetro.
+
+\section{Resultados asintóticos}
+En las secciones anteriores hemos tratado $\Lambda(x)$ con tamaños de muestra pequeños, en general conocer su distribución es difícil (aún sabiendo que ella es función de estadísticos suficientes).
+
+En esta sección mostramos la distribución límite del estadístico $\Lambda(x)$. Nos basamos en la prueba de \cite{Lehmann} (pág. 527) pero aportaremos comentarios para mayor claridad. 
+En \cite{Lehmann} (pág. 527) pide los siguientes supuestos para la validez de su prueba: 
+\begin{enumerate}
+\item La distribución $P_\theta$ de las observaciones son distintas, es decir, $P_{\theta_1} = P_{\theta_2}$ implica que $\theta_1 =\theta_2$\footnote{ Cuando se satisface esta condición, se dice que el parámetro $\theta$ es
+Identificable}
+.
+\item  El espacio parametral $\Theta$ es un intervalo abierto. $(\theta_{-},\theta^{+})$
+\[\Theta: -\infty \leq  \theta _{-} \leq \theta \leq \theta^{+} < \infty \]
+\item Las observaciones son $X =(X_1,\dots, X_n)$, donde $X_i$ son iid con función de distribución $f_\theta(x)$ continua o discreta.
+\item El conjunto $A = \{  x:f_\theta(x) >0 \}$ es independiente de $\theta$
+\item $\forall x \in A, f_\theta(x)$ es diferenciable con respectoa a $\theta$, denotanto a su derivada de la manera usual $f_\theta'(x)$
+\item  $\forall x \in A$ (especificada en A), la densidad $f_\theta(x)$ es tres veces diferenciable con respecto a $\theta$ y la tercera derivada es continua. Las correspondientes derivadas de la integral $\int f_\theta(x)dx$ pueden ser obtenidas por diferenciación bajo el signo de integral.
+\item Si $\theta_0$ denota el verdadero valor de $\theta$ existe un numero positivo $c(\theta_0)$ y una función $M_{\theta_0}(x)$ tal que 
+\begin{equation}
+\left|\frac{\partial^3}{\partial \theta^3} \ln f_\theta(x) \right| \leq M_{\theta_0}(x), \textrm{          } \forall x \in A, \textrm{     } |\theta-\theta_0| < c(\theta_0)
+\end{equation}
+Y
+\begin{equation}
+\mathbf{E}M_{\theta_0}(x) < \infty
+\end{equation}
+\end{enumerate}
+
+Antes de comenzar la prueba notemos que si $\hat{\theta}_n$ denota el estimador de máxima verosimilitud (MLE) de $\theta$, para resumir la notación empleemos $L(\hat{\theta}_0|x) = L(\hat{\theta}_0)$ y $l(\theta) = \ln L(\hat{\theta}_0)$
+
+\[
+\Lambda(x) = \frac{L(\hat{\theta}_0)}{L(\hat{\theta}_n)}
+\]
+Al tomar sus logaritmos (que no afecta la monotonía de la función $\Lambda$)
+\begin{equation}
+\begin{split}
+\Delta_n  &=  ln \left( (\Lambda(x) )^{-1} \right)\\ &= \ln ( L(\hat{\theta}_n) )- \ln \left( L(\hat{\theta_0}) \right) = l(\hat{\theta}_n) -l({\theta}_0)
+\end{split}
+\end{equation}
+\begin{theorem}
+Bajo las suposiciones enlistadas anteriormente, si $\hat{\theta}_n$ maximiza la verosimilitud \footnote{ Típicamente, pero no siempre se emplean los MLE} , bajo la hipótesis $H_0: \theta = \theta_0$ el estadístico 2$\Delta_n$ tiende a una distribución $\chi^2$ con un grado de libertad.
+\end{theorem}
+Prueba (detallada): \\
+Utilizando parcialmente la hipotesis (6) junto con la (2) podemos consideremos la expansión de Taylor de segundo para $l(\hat{\theta}_n)$ alrededor de $\theta_0$   
+\begin{equation}
+l(\hat{\theta}_n) = l(\theta_0) +(\hat{\theta}_n - \theta_0)l'(\theta_0) + \frac{1}{2}(\hat{\theta}_n - \theta_0)^2l_n''(\theta^*)
+\end{equation}
+Con $\theta^* \in (\theta_0, \hat{\theta^*}_n)$. Utilizando (12) en (11) tenemos 
+\begin{equation}
+\begin{split}
+l(\hat{\theta}_n) -l({\theta}_0) &=
+( l(\theta_0) +(\hat{\theta}_n - \theta_0)l'(\theta_0) + \frac{1}{2}(\hat{\theta}_n - \theta_0)^2l_n''(\theta^*) )-l({\theta}_0)\\
+& = (\hat{\theta}_n - \theta_0)l'(\theta_0) + \frac{1}{2}(\hat{\theta}_n - \theta_0)^2l_n''(\theta^*)
+\end{split}
+\end{equation}
+Y como $l(\hat{\theta}_n) = 0$ (por el enunciado del teorema), tenemos que 
+\begin{equation*}
+\begin{split}
+-l({\theta}_0) &=
+ l(\theta_0) +(\hat{\theta}_n - \theta_0)l'(\theta_0) + \frac{1}{2}(\hat{\theta}_n - \theta_0)^2l_n''(\theta^*) \\
+\end{split}
+\end{equation*}
+Derivando la expresión anterior (empleando totalmente la suposición 6) obtenemos que 
+\begin{equation}
+\begin{split}
+-l'({\theta}_0) &=
+( l'(\theta_0) +(\hat{\theta}_n - \theta_0)l''(\theta_0) + \frac{1}{2}(\hat{\theta}_n - \theta_0)^2l_n'''(\theta^*) \\
+\end{split}
+\end{equation}
+Y sustituyendo (14) en (13), llegamos a 
+\begin{equation}
+\begin{split}
+\Delta_n = -n(\hat{\theta}_n - \theta_0)^2
+\left[\frac{l''(\theta_0)}{n} - \frac{l''(\theta^*)}{2n} + \frac{1}{2}(\hat{\theta}_n - \theta_0) \frac{l''(\theta^*)}{n} \right]\\
+\end{split}
+\end{equation}
+Donde el tercer término de la derecha tiende a cero pues por la condición (7) la tercer derivada está acotada.
+
+El primer término de la derecha tiende en probabilidad a menos la información de Fisher $(\theta_0)$ como lo probamos en clase.
+
+Y el segundo termino también converge a $I(\theta_0)$ pues $\frac{l''(\theta^*)/n}{ l''(\theta_0)/n }$  converge en proba a la unidad. Esto es porque 
+si usamos la expansión de Taylor sobre $l''_n(\theta^*)$ alrededor de $\theta_0$ tenemos
+\[
+(\frac{1}{n})l''_n(\theta^*) = (\frac{1}{n})l''_n(\theta_0) +(\frac{1}{n}) (\theta^*- \theta_0)l'''(\theta^{**}) 
+\]
+Y usando la parte de que $|\theta^* - \theta_0|$ (de la suposición (7))  está acotada al igual que $l'''(\theta^{**})$ por lo que sí $n \rightarrow \infty$ entonces se cumple que el segundo término de (15) tiende a $I(\theta_0)$
+
+Hasta aquí (15) (después de multiplicar por dos ambos lados) se reduce a 
+\begin{equation}
+\begin{split}
+\Delta_n = n(\hat{\theta}_n - \theta_0)^2I(\theta_0) = (\sqrt{n}(\hat{\theta}_n - \theta_0))^2I(\theta_0)\\
+\end{split}
+\end{equation}
+Y finalmente, en clase probamos que los MLE se distribuyen normalmente, y el resultado es valido para los estimadores que maximicen la verosimilitud sin derivar, entonces lo anterior puede verse como una variable aleatoria con distribución $N(0,1/I(\theta_0)) $ elevada al cuadrado, lo que se distribuye como $\chi^2$ con un grado de libertad.
+
+
+Como resultado final, diremos que el teorema anterior se puede generalizar en la manera que uno espera cuando $\theta$ es un vector, las siete condiciones citadas son necesarias además de una más la cual dice que los elementos $I_{ij}(\theta)$ de la matriz de Fisher son finitos y la matriz $I(\theta)$ es positiva definida.  Si $\hat{\theta}$ es un máximo de la verosimilitud consistente, la distribución de $2\Delta_n$ tiene a una distribución $\chi^2$ con $k$ grados de libertad, donde k es la diferencia entre el número de parámetros independientes en $\Theta$ y el numero de parámetros en $\Theta_0$ es decir el que $k$ es el numero de parámetros que no están presentes explícitamente en la $H_0$. La prueba es paralela a la dada en la sección anterior donde la expansión en Taylor de $l_n(\hat{\theta}_n)$ es reemplazada por su correspondiente expansión en Taylor multivariada. Remitimos a \cite{Wilks} (pág. 419) para la prueba formal.   
+\subsection{Una pequeña aplicación}
+Aunque existe teoría para aplicar LRT cuando $\theta$ es un vector y los modelos lineales, con lo desarrollado hasta aquí podemos efectuar una prueba para medir el desempeño de dos modelos.
+
+Sean dos modelos lineales. El primero estima $m$ parámetros, digamos que es nuestro modelo 'presente' y denotémoslo por $l_1$, y el segundo estima $n$ con $n<m$, llamémosle a este segundo modelo 'reducido' y denotémoslo por $l_0$.
+Podemos plantear la hipótesis $H_0$ como que lo estipulado por el modelo reducido es cierto es decir que algunos de los parámetros estimados en $l_1$ son de poca significancia.
+Bajo los supuestos de los modelos lineales podemos calcular la verosimilitud de ambos modelos y realizar el cociente entre ellas $\Lambda(x) = \frac{L( l_0|x)}{L(l_1|x)}$, podemos además utilizar el resultado asintótico y rechazar la hipótesis nula si esta $2\Delta_n < \chi^2_{\alpha,m-n}$, es decir si el doble producto del logaritmo de las verosimilitudes es menor al cantil $\alpha$ de una $\chi^2$ con $(m-n)$ grados de libertad. Que se traduciría en que el modelo reducido es mejor pues aceptamos $H_0$ 
+
+En la última sección del apéndice A realizamos un ejemplo implementado en R, que servirá como ejercicio para la clase del día 4 de diciembre del 2017 de la asignatura de inferencia estadística para los alumnos de primer semestre de la maestría en computo estadístico. El ejercicio consistirá en utilizar una aplicación implementada en R, para comprobar el desempeño de modelos lineales. El código para dicha aplicación se encuentra en el último anexo, aunque la applicación puede ser consultada en la siguiente liga: \url{https://fou-foo.shinyapps.io/applrt/}
+
+
+
+\section{Conclusiones}
+Como demostramos en este reporte la prueba LRT es de una aplicación bastante general, sin embargo, requiere de conocer la distribución de la variable sobre la que se esta muestreando. Pero como lo hemos notado, surge de manera de manera natural al considerar los problemas de probar hipótesis. 
+Hemos aprendido que la prueba no siempre es posible de efectuar pues podría ser que los supremos involucrados en la verosimilitudes no lo permitan, de manera general esta prueba no garantiza ser UMP pues requiere que la distribución con la que se esta trabajando posea una razón de verosimilitudes no decreciente (eso limita la prueba) en la literatura existen ampliaciones de esta idea y su relación con los modelos lineales (vease \cite{Wilks}), también en \cite{Wilks} se muestra que LRT es equivalente al test de Wald y al de Rao (y nosotros vimos que sin resultado asíntotico los test de Student y la prueba 'F' son UMP).  
+
+En su distribución asintótica y cuando los MLE de la densidad con la que se trabaja existen LRT permite comparar el desempeño de modelos y es uno de sus usos más comunes. 
+
+El estudio de este tema permitió ‘amarrar’ el conocimiento adquirido a lo largo del semestre sobre variables aleatorias, convergencia, intervalos de confianza y lo que se ha aprendido en otras asignaturas (como algebra matricial). En especial las generalizaciones siguientes de LRT (en el sentido de ser de mayor complejidad intelectual) requieren de conocer temas como que es la información de Fisher y fuertemente la teoría detrás de los MLE y sus propiedades en casos multivariados.
+
+
+
+\appendices
+\section{ Ejemplos}
+\subsection{ Relación con la prueba $\chi^2$.} 
+Seguimos el ejemplo de \cite{Rice} (pág. 341).\\ Consideremos un experimento en el cual existe de un mecanismo (honesto) el cual permite que $n$ pelotas se depositen en $m$ celdas. 
+Desarrollemos una prueba de bondad de ajuste con hipótesis nula $H_0$ la cual consiste en que la distribución de las pelotas (ya depositadas en las casillas) sigue una distribución multinomial de parámetros $n$ y $p=(p_1,\dots, p_m)$ (un vector de probabilidades $p_i$ que es función de un parámetro no observado, es decir $p=p(\theta ),\theta \in w_0$).Y la hipótesis alternativa $H_1$ la cual establece que las probabilidades $p_i$ son libres (con la restricción de que son no negativas y deben sumar la unidad). 
+
+Notemos que este ejemplo se compone de la hipótesis nula en donde las probabilidades esperadas $H_0: p_i(\theta) = \hat{p}_i$, bajo la distribución multinomial, es decir que compara las proporciones observadas contra las téoricas).
+
+El numerador en el cociente de verosimilitud es:
+\[
+max_{p\in w_0} \left( \frac{n!}{x_1!x_2!\dots x_m!} \right)p_1^{x_1}(\theta)p_2^{x_2}(\theta)\dots p_n^{x_m}(\theta)
+\] 
+Donde las $x_i$ es el número de pelotas observadas en la casilla $m$. Por la propiedad de equivarianza de los estimadores de máxima verosimilitud, esta verosimilitud alcanza su máximo cuando $\hat{\theta}$ es el estimador de máxima verosimilitud de $\hat{\theta}$. Denotamos por $p_i(\hat{\theta})$ a las correspondientes probabilidades.  
+Como los parámetros $p_i$ no están restringidos en su espacio parametral $\Omega$, el denominador de la razón de verosimilitudes se puede maximizar, es decir que 
+\[
+	\hat{p}_i = \frac{x_i}{n}
+\]
+Es decir que el radio de verosimilitudes queda de la siguiente forma 
+\[ 
+\Lambda = \frac{   \frac{n!}{x_1!\dots x_m!}  p_1(\hat{\theta})^{x_1}  \dots p_m(\hat{\theta})^{x_m} }  {\frac{n!}{x_1!\dots x_m!} \hat{p}_1^{x_1} \dots \hat{p}_m^{x_m}} = \prod_{i=1}^m\left( \frac{p_i(\theta}{\hat{p}_i}\right)
+\]
+Como $x_i = n \hat{p}_i$ podemos escribir
+
+\begin{equation}\label{A1}
+\begin{split}
+-2\ln \Lambda & =-2n\sum_{i=1}^m\hat{p}_i \ln \left( \frac{p_i(\theta}{\hat{p}_i}\right) \\
+\end{split}
+\end{equation}
+\begin{equation*}+
+\begin{split}
+& =2\sum_{i=1}^m(n\hat{p}_i) \ln \left( \frac{np_i(\theta}{n\hat{p}_i}\right)^{-1} \\
+& =2\sum_{i=1}^n\mathbf{O}_i\ln \left( \frac{\mathbf{O_i}}{\mathbf{E}_i} \right)\\
+\end{split}
+\end{equation*}
+
+Donde $\mathbf{O}_i = n\hat{p}_i, \mathbf{E}_i=np_i(\hat{\theta}$ denotan el número de pelotas en la i-ésima casilla observado y esperado, respectivamente.\\
+En este ejemplo el vector $p$ es de dimensión $m$ sin embargo al fijar la restricción de que las probabilidades sumen uno se pierde un grado de libertad en el denominador de la razón de verosimilitud. Si bajo $H_0$ las probailidades $p_i(\hat{\theta})$ dependen del parámetro $\theta$, con dimensión $k$  que fue obtenido de una muestra de tamaño $k$, entonces el estadístico $-2 \ln \Lambda$ se distribuye asintóticamente como una $\chi^2$ con $m-k-1$ grados de libertad (que es precisamente el numero de celdas menos el número de parámetros estimados).\\
+El estadístico de Pearson $\chi^2$ es usado para bondad de ajuste y en nuestro caso tendría la forma 
+\[    X^2 = \sum_{i=1}^{m}\frac{ [ x_i-np_i(\hat{\theta} ]^2}{np_i(\hat{\theta}}
+\]
+Si usamos en \ref{A1} la expansión en Taylor de la función $f(x) = x \ln \left( \frac{x}{x_0} \right)$, alrededor de $x_0$, la cual es $f(x)=(x-x_0) +\frac{1}{2}(x - x_0)^2\frac{1}{x_0}+\dots$
+Obtenemos que 
+\[ 
+-2 \ln \Lambda \approx 2n \sum_{i=1}^m [\hat{p}_i - p_i ( \hat{\theta})] + n\sum_{i=1}^m\frac{[\hat{p}_i - p_i ( \hat{\theta})]^2}{ p_i ( \hat{\theta})}
+\]
+Donde notamos que el primer término del lado derecho de la última igualdades igual a cero pues las probabilidades deben de sumar uno y el segundo termino puede ser expresado como:
+\[ 
+\begin{split}
+n\frac{n}{n}\sum_{i=1}^m\frac{[\hat{p}_i - p_i ( \hat{\theta})]^2}{ p_i ( \hat{\theta})} =\sum_{i=1}^m\frac{[x_i - np_i ( \hat{\theta})]^2}{ np_i ( \hat{\theta})} =\sum_{i=1}^m\frac{[x_i - np_i ( \hat{\theta})]^2}{ np_i ( \hat{\theta})} 
+\end{split}
+\]
+El cual es el estadístico que emplea la prueba de bondad de ajuste $\chi^2$
+\begin{cframed}[violet]{En contraste la prueba} $\chi^2$ {es más fácil de implementar sin una computadora.}
+\end{cframed}
+
+\subsection{ Relación con la prueba $t$}
+Consideremos la prueba $\mu = \mu_0$ contra $\mu \ne \mu_0$ de una muestra aleatoria de tamaño $n$ que provienen de una distribución normal $N(\mu,\sigma^2)$, donde $\mu$ y $\sigma^2$ son desconocidos. En este caso $\Theta_0 = \{(\mu_0,\sigma^2):\sigma^2>0\}$ y $\Theta =\{(\mu_0,\sigma^2):- \infty < \mu < \infty,\sigma^2>0\}$. Escribamos $\theta=(\mu, \sigma^2)$
+Primero fijémonos en el denominador de $\Lambda(x)$ es decir $\sup_\Theta L(\theta | x)$ con la notación que hemos dado de $\theta$
+\begin{equation} \tag{*}
+\begin{split}
+\sup_\Theta L(\theta | x) = \sup_{\mu, \sigma^2} \left[ \frac{1}{(\sigma\sqrt{2\pi})^n} exp\left\{  -\frac{\sum_1^n(x_i-\mu)^2}{2\sigma^2} \right\}  \right] \\
+\end{split}
+\end{equation}
+ Sabemos que este denominador se maximiza con los estimadores $(\bar{x},\hat{\sigma}^2)$ de máxima verosimilitud (MLE), y escribiendo $\sum_1^n(x_i-\mu)^2 = n\hat{\sigma}^2$, la expresión (*) se reduce a   
+\begin{equation*}
+\begin{split}
+\sup_\Theta L(\theta | x) & = \left[ \frac{1}{ (\sigma^{2 \frac{n}{2}} ) (2\pi)^{n/2}} exp \left\{  -n/2 \right\} \right] \\
+& = \left[ \frac{1}{ (2\pi/n)^{n/2} \left( (\sum_1^n(x_i -\mu)^2\right)^{ n/2} } exp \left\{  -n/2 \right\} \right] \\
+\\\end{split}
+\end{equation*}
+Por otro lado el numerador de $\Lambda(x,y)$ queda como 
+\begin{equation}\tag{**} 
+\begin{split} 
+\sup_{\Theta_0} L(\theta_0 | x) = \sup_{\mu, \sigma^2>0} \left[ \frac{1}{(\sigma\sqrt{2\pi})^n} exp\left\{  -\frac{\sum_1^n(x_i-\mu_0)^2}{2\sigma^2} \right\}  \right] \\
+\end{split}
+\end{equation}
+Y nuevamente usando el MLE para $\sigma^2$ y  $\sum_1^n(x_i-\bar{x})^2 = n\hat{\sigma}^2$ la expresión (**) se reduce a 
+\begin{equation*}
+\begin{split}
+\sup_\Theta L(\theta | x)
+& = \left[ \frac{1}{ (2\pi/n)^{n/2} \left( (\sum_1^n(x_i -\mu_0)^2\right)^{ n/2} } exp \left\{  -n/2 \right\} \right] \\
+\\\end{split}
+\end{equation*}
+Así pues 
+\[
+\Lambda(x) =\left\{ \frac{\sum_1^n(x_i-\bar{x})^2}{\sum_1^n(x_i-\mu_0)^2} \right\}^{n/2} = \left\{ \frac{1}{   1+[n(\bar{x}-\mu_0)^2/\sum_1^n(x_i-\bar{x})^2  ]} \right\}^{n/2}
+\]
+La prueba LRT rechaza $H_0$ si $\Lambda (x) <c $, como  $\Lambda (x)$ es una función decreciente de $n(\bar{x}-\mu_0)^2/\sum_1^n(x_i-\bar{x})^2$, entonces rechazaremos $H_0$ si  
+\[
+\begin{split}
+	\left| \frac{\bar{x}-\mu_0}{\sqrt{\sum_1^n(x_i-\bar{x})^2}}\right| > c'\\
+    \textrm{ o equivalentemente si } \\
+    	\left| \frac{\sqrt{n}(\bar{x}-\mu_0)}{s}\right| > c''\\
+\end{split}
+\]
+En el curso de inferencia estadístico aprendimos a identificar distribuciones de variables aleatorias y fue un ejemplo que el estadístico 
+\[
+t(\mathbf{X} = \frac{\sqrt{n}(\bar{x}-\mu_0)}{s}
+\]
+Tiene una distribución t de Student con $n-1$ grados de libertad, para finalizar este ejemplo haremos la observación de que la prueba $t$, obtenida aquí, de dos colas es UMP.
+\subsection{Relación con la prueba $F$}
+
+Sean $X_1,\dots, X_m$ y $Y_1,\dots, Y_n$ dos muestras aletorias independientes que provienen de distribuciones normales $N(\mu_1, \sigma_1^2)$ y $N(\mu_2, \sigma_2^2)$ respectivamente. Deseamos realizar la prueba $H_0:\sigma_1^2 = \sigma_2^2$ contra $H_1: \sigma_1^2 \ne \sigma_2^2$. En este caso tenemos que:
+\[
+\Theta = \{ (\mu_1, \sigma_1^2, \mu_2, \sigma_2^2 ): -\infty < \mu_i < \infty , \sigma_i^2 >0, i=1,2\}
+\]
+Y por ende
+\[
+\Theta_0 = \{ (\mu_1, \sigma_1^2, \mu_2, \sigma_2^2 ): -\infty < \mu_i < \infty , \sigma_1^2=\sigma_2^2  >0\}
+\]
+Sea $\theta = (\mu_1, \sigma_1^2, \mu_2, \sigma_2^2 )$, entonces como las dos muestras son independientes su función de verosimilitud es el producto de cada una de ella por lo que el denominador de $\Lambda(x,y)$ queda de la siguiente forma  
+\begin{equation*}
+\begin{split}
+\sup_\Theta L(\theta | x) = \sup_{\theta} \left[ \frac{exp\left\{  -\frac{\sum_1^m(x_i-\mu)^2}{2\sigma_1^2} -\frac{\sum_1^n(y_i-\mu)^2}{2\sigma_2^2} \right\}}{ \sigma_1^m\sigma_2^n{(2\pi)}^{(n+m)/2}}   \right] \\
+\end{split}
+\end{equation*}
+De manera análoga a como reducimos la expresión para la verosimilitud del ejercicio anterior en la expresión (**), al usar el hecho de que los MLE son $\hat{\mu_1} = \bar{x}, \hat{\mu_2} = \bar{y},(1/m)\sum_1^m(x_i-\bar{x})^2 = \hat{\sigma_1}^2$ y $(1/n)\sum_1^n(y_i-\bar{y})^2 = \hat{\sigma_2}^2$. Y aplicando en la expresión anterior que $ \sum_1^m(x_i-\bar{x})^2 =m \hat{\sigma_1}^2$ y $\sum_1^n(y_i-\bar{y})^2 = n\hat{\sigma_2}^2$
+Obtenemos que 
+\begin{equation*}
+\begin{split}
+\sup_\Theta L(\theta | x) =   \frac{exp \left\{  -(m+n)/2 \right\}}{ (2\pi/n)^{n/2}(2\pi/m)^{m/2} \left( \sum_1^m(x_i -\bar{x})^2\right)^{ m/2} \left( \sum_1^n(y_i -\bar{y})^2\right)^{ n/2} }  \\
+\end{split}
+\end{equation*}
+Por otra parte el estimador MLE de la varianza $
+\hat{\sigma}^2$ esta dado por \[\hat{\sigma}^2 = \frac{\sum_1^m(x_i -\bar{x})^2 + \sum_1^n(y_i -\bar{y})^2}{m+n}\]
+Lo que junto a la expresión (**) nos permite escribir que el numerador de $\Lambda(x,y)$ es e la siguiente forma 
+\begin{equation}\tag{***} 
+\begin{split} 
+\sup_{\Theta_0} L(\theta | x) =   \frac{exp \left\{  -(m+n)/2 \right\}}{ [2\pi/(m+n)]^{(m+n)/2} \left( \sum_1^m(x_i -\bar{x})^2 + \sum_1^n(y_i -\bar{y})^2\right)^{ (m+n)/2} }  \\
+\end{split}
+\end{equation}
+Si escribimos $m' = \left(\frac{m}{m+n} \right)^{m/2}$ y $n' = \left(\frac{n}{m+n} \right)^{n/2}$, podemos escribir 
+\[ 
+\Lambda(x,y) = m'n' \frac{\left( \sum_1^m(x_i -\bar{x})^2\right)^{ m/2} \left( \sum_1^n(y_i -\bar{y})^2\right)^{ n/2}}{\left( \sum_1^m(x_i -\bar{x})^2 + \sum_1^n(y_i -\bar{y})^2\right)^{ (m+n)/2}}
+\]
+Ahora si escribimos 
+\[ f = \frac{\sum_1^m(x_i -\bar{x})^2/(m-1)}{\sum_1^n(y_i -\bar{y})^2/(n-1)}\]
+Después de un poco de algebra, reducimos la expresión para $\Lambda(x,y)$ quedando 
+\begin{equation*}
+\begin{split}
+\Lambda(x,y) & =  \frac{ m'n' }{\{1+ [(m-1)/(n-1) ]f \}^{n/2}+\{1+ [(n-1)/(m-1) ](1/f) \}^{m/2}}
+\end{split}
+\end{equation*}
+Como la prueba $LRT$ pide que $\Lambda(x,y) <c$, podemos comprobar que esta condición es equivalente a que la $f$ definida satisfaga $f>c_2$ (después de despejar y definir $a=(m-1)/(n-1)$ la $c_2$ que satisface esto esta dada por 
+\[
+c_2 = \frac{\frac{(m/(m+n)) (n/(m+n))^{n/m} }{c^{n/m}(2+\left((\sum_1^m(x_i-\bar{x})^2/\sum_1^n(y_i-\bar{y})^2)\right) + \left((\sum_1^n(y_i-\bar{y})^2/\sum_1^m(x_i-\bar{x})^2)\right)}-1}{a}
+\]
+Donde la c del númerador es la misma que satisface $\Lambda(x,y) < c$. Así pues la prueba LRT para probar la igualdad de dos varianzas en muestras normales es equivalente a la prueba $F$, el estadístico definido por $f$, como vimos en clase tiene una distribución F de Fisher.
+
+\section{Resultados útiles}
+\subsection{Teorema de factorización}
+\begin{theorem}
+Sea $f(x|\theta)$ la distribución conjunta de una muestra $\mathbf{X}$. Un estadístico $T(\mathbf{X})$ es un estadístico suficiente para $\theta$ si y solo si existen funciones $g(t|\theta)$ y $h(x)$ tales que para todos los puntos muestrales $x$ y para todos los puntos del parámetro $\theta$ 
+\[
+f(x|\theta) = g(T(x)|\theta)h(X)
+\]
+\end{theorem}
+En \cite{Casella} (pág.250) se da una prueba para variables aleatorias discretas.
+
+\onecolumn
+\section{Código}
+El código para realizar la aplicación que servirá como ejercicio se encuentra en \url{https://github.com/fou-foo/MCE/tree/master/First/InferenciaEstadistica/appLRT}, por completez lo incluimos aquí,se compone de tres partes, la primera hecha en R es el siguiente:
+
+\begin{minted}{R}
+library(shiny)
+library(ggplot2)  # for the diamonds dataset
+library(plotly)
+library(lmtest)
+library(shinydashboard)
+library(reshape2)
+library(MASS)
+mtcars 
+carros <- mtcars[,c("mpg", "disp","drat")]
+modelo.actual<-lm(mpg ~  disp+drat, data = carros)
+carros$z_hat<- as.numeric(modelo.actual$fitted.values)
+ui <- fluidPage(
+  h1("Ejemplo para la eleccion de modelos usando LRT"),
+
+    mainPanel(
+      tabsetPanel(
+        id = 'dataset',
+        tabPanel("Exploracion",
+                 selectInput('x', 'Variables explicativas X', names(mtcars)[c(1,3, 4,5,6,7)])
+                   ,plotlyOutput("plot")),
+        
+        tabPanel("Seleccion de modelo lineal ",
+                 tabItem(tabName="foo",
+                         withMathJax(includeMarkdown("Tehory.Rmd"))),
+                  hr(),
+                 h3('La densidad de las variables independientes es la siguiente'),
+                 plotlyOutput("kernel"),
+                 h4('El modelo estimado por MV se ve de la siguiente forma'),
+                 plotlyOutput("modelo.actual") ,
+                 h5("Ejercicio"),
+                 h3("Construye modelo lineales con las siguientes variables,"),
+                 h3("reporta cuales de ellos aceptarias la hipotesis nula"),
+                 h1("Analisis","LRT!"),
+                 tableOutput("LRT"),
+                 checkboxGroupInput("variables", label = h3("Variables en el modelo"), 
+                                    choices = list("disp",  "hp", "drat", "wt", "qsec" ),
+                                    selected = "disp")
+                ),
+        tabPanel("Doc",
+                 tabItem(tabName="foo",
+                         withMathJax(includeMarkdown("Datos.Rmd"))),
+                 hr())
+      )
+    )
+  )
+
+
+
+# Define server logic required to draw a histogram
+server <- function(input, output, session) {
+  
+  
+  
+   output$plot <-  renderPlotly({ 
+     plot_ly(data = mtcars,  x = ~get(input$x), y = ~mpg,
+                marker = list(size = 10,
+                              color = 'rgba(30,0,125,.6)',#'rgba(30,0,125,.6)',#'rgba(30,0,125,.6)',
+                              line = list(color = 'rgb(58,200,225)',
+                                          width = 1)),
+             text = ~paste("mpg: ", mpg, paste0('<br> ', (input$x),":") ,get(input$x) )) %>%
+     layout(title = 'Dispersion de las variables contra mpg')
+       
+   })
+  
+     output$modelo.actual <-  renderPlotly({
+       graph_reso <- 1
+       #Setup Axis
+       axis_x <- seq(min(carros$disp), max(carros$disp), by = graph_reso)
+       axis_y <- seq(min(carros$drat), max(carros$drat), by = graph_reso)
+       #Sample points
+       petal_lm_surface <- expand.grid(disp = axis_x, drat = axis_y,KEEP.OUT.ATTRS = FALSE)
+       petal_lm_surface$z_hat <- predict(modelo.actual, newdata = petal_lm_surface)
+       petal_lm_surface <- acast(petal_lm_surface,  drat~disp,value.var = "z_hat") #y ~ x
+       
+       output$modelo.actual <-  renderPlotly({ 
+         d <- plot_ly(carros, 
+                    x = ~disp, 
+                    y = ~drat, 
+                    z = ~mpg,
+                    type = "scatter3d", 
+                    mode = "markers",
+                    marker = list(size = 6,
+                                  color = 'rgba(195,47,47,.9)',#'rgba(30,0,125,.6)',
+                                  line = list(color = 'rgb(58,200,225)',
+                                              width = .2))) %>% add_trace(
+                                z = petal_lm_surface,
+                                x = axis_x,
+                                y = axis_y,
+                                type = "surface") 
+       })
+       output$kernel <-  renderPlotly({ 
+         kd <- kde2d(carros[,"disp"], carros[,"drat"], n = 32)
+          plot_ly(x = kd$x, y = kd$y, z = kd$z) %>% 
+           add_surface(x = kd$x, y = kd$y, z = kd$z, opacity = 0.98)
+         
+       })
+       
+       selectedData.Exploracion <- reactive({
+         carro2<- mtcars[, c(input$variables,"mpg" )]
+         modelo.reducido <- lm(mpg~ ., carro2)
+         m <- lrtest(modelo.reducido, modelo.actual)
+         return(m) 
+       })
+       output$LRT <- renderTable({
+         (selectedData.Exploracion())
+       })
+       
+     })
+}
+shinyApp(ui, server)
+\end{minted}
+La segunda parte se compone de dos archivos, el perimero es:
+\begin{minted}{python}
+---
+title: "Theory"
+output: 
+  html_document:
+    mathjax: "http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"
+---
+
+
+# Consideremos la hipotesis $H_0:$ como que el modelo reducido dice la verdad
+
+## Nuestro modelo actual (obtenido por exhaustivos analisis) esta dado por 
+
+\[
+ Y_{mpg} =  \alpha_0 + \alpha_1X_{disp}+\alpha_2X_{drat}
+\]
+\end{minted}
+El tercer archivo es 
+\begin{minted}{R}
+---
+title: "Datos"
+output: 
+  html_document:
+    mathjax: "http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"
+---
+
+El conjunto de datos es de 32 carros de modelos de 1973 a 1974, un dataset contenido en el package ‘datasets’ de R.
+
+Las variables que contemplamos son :
+
+-	*mpg* : Millas por gallon de gasolina
+-	*disp*: Desplasamiento
+-	*hp*: Caballos de fuerza del auto
+-	*drat*: Rear axie ratio
+-	*wt*: Peso (1000 lbs)
+-	*qsec* Tiempo en que recorre un cuarto de milla
+	
+
+
+\end{minted}
+\newpage
+
+\begin{thebibliography}{99}
+
+
+
+\bibitem{Casella}{   Casella G., Berger R. (1990)};    {\it  Statistical Inference} Duxbury. 
+
+
+\bibitem{Lehmann}{   Lehmann, E.L (1999)}    {\it  Elements of Large-Sample Theory} Springer. 
+
+\bibitem{R}{R Core Team (2017)} {\it R: A language and environment for statistical computing}. R Foundation for Statistical Computing, Vienna, Austria. \url{ https://www.R-project.org/}
+\bibitem{Rice}{   Rice, John A. (2007)}    {\it  Mathematical Statistics and Data Analysis} 3rd, Duxbury. 
+
+\bibitem{Rohatgi}{   Rohatgi V.,Ehsames S. (2015)};    {\it  An Introduction to probability and statistics }3rd, Wiley.
+
+\bibitem{Wasserman}{   Wasserman,L. (2005)}    {\it  Mathematical Statistics and Data Analysis} 2nd, Springer. 
+
+\bibitem{Wilks}{  Wilks. S. M, (1962) 
+}    {\it  Mathematical Statistics }  Wiley.
+
+\end{thebibliography}
+
+
+
+\end{document}
+
+
